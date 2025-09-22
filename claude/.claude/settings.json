@@ -1,0 +1,55 @@
+{
+  "feedbackSurveyState": {
+    "lastShownTime": 1754016832126
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c 'input=$(cat); MODEL=$(echo \"$input\" | jq -r \".model.display_name\"); DIR=$(echo \"$input\" | jq -r \".workspace.current_dir\"); echo \"[$MODEL] ${DIR##*/}\"'"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "defaultMode": "plan",
+    "allowedCommands": [
+      "go",
+      "gofmt",
+      "go mod",
+      "go build",
+      "go run",
+      "go test",
+      "go install",
+      "go get",
+      "node",
+      "npm",
+      "npx",
+      "yarn",
+      "pnpm",
+      "bun",
+      "bun install",
+      "bun run",
+      "bun build",
+      "bun test"
+    ],
+    "allowedPaths": [
+      "go.mod",
+      "go.sum",
+      "package.json",
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "bun.lockb",
+      "node_modules/**",
+      "vendor/**",
+      "*.go",
+      "*.js",
+      "*.ts",
+      "*.jsx",
+      "*.tsx",
+      "*.json",
+      "*.md"
+    ],
+    "blockedPaths": [
+      ".env*",
+      ".envrc"
+    ]
+  }
+}

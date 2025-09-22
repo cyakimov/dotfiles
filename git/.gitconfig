@@ -1,0 +1,25 @@
+[core]
+	excludesFile = ~/.gitignore_global
+	autocrlf = input
+[credential "https://github.com"]
+	helper = !gh auth git-credential
+[credential]
+	helper = store
+
+[include]
+    path = ~/git-personal.conf
+[includeIf "gitdir:~/Development/Work/"]
+    path = ~/git-work.conf
+[push]
+	autoSetupRemote = true
+
+[url "git@gitlab.com:"]
+        insteadOf = https://gitlab.com
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[color]
+  ui = auto

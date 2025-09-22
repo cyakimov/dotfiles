@@ -1,0 +1,13 @@
+[tools]
+node = "latest"
+bun = "latest"
+go = "latest"
+python = "3.11"
+uv = "latest"
+rust = "stable"
+ruby = "latest"
+"gem:cocoapods" = "latest"
+
+[settings]
+experimental = true
+idiomatic_version_file_enable_tools = []
