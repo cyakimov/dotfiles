@@ -1,11 +1,4 @@
 {
-  "feedbackSurveyState": {
-    "lastShownTime": 1754016832126
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "bash -c 'input=$(cat); MODEL=$(echo \"$input\" | jq -r \".model.display_name\"); DIR=$(echo \"$input\" | jq -r \".workspace.current_dir\"); echo \"[$MODEL] ${DIR##*/}\"'"
-  },
   "includeCoAuthoredBy": false,
   "permissions": {
     "defaultMode": "plan",
@@ -51,5 +44,13 @@
       ".env*",
       ".envrc"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754016832126
   }
 }
