@@ -1,0 +1,23 @@
+# Font configuration
+font-family = JetBrains Mono
+font-size = 14
+
+# Theme
+theme = Catppuccin Mocha
+
+# Copy/paste improvements
+clipboard-trim-trailing-spaces = true
+copy-on-select = true
+
+# Scrollback limit (~10MB)
+scrollback-limit = 10000000
+
+# Shell integration
+shell-integration = detect
+
+# Window settings
+window-inherit-working-directory = true
+window-inherit-font-size = true
+
+# Mouse behavior
+mouse-hide-while-typing = true
