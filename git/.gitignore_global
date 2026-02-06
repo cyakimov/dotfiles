@@ -75,3 +75,6 @@ xcuserdata/
 *.xcuserstate
 *.xccheckout
 *.xcscmblueprint
+
+# AI
+.claude
