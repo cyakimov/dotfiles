@@ -1,7 +1,7 @@
 [tools]
 node = "latest"
 bun = "latest"
-go = "latest"
+go = "1.25"
 python = "3.11"
 uv = "latest"
 rust = "stable"
