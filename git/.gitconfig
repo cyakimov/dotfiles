@@ -2,7 +2,8 @@
 	excludesFile = ~/.gitignore_global
 	autocrlf = input
 [credential "https://github.com"]
-	helper = !gh auth git-credential
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
 [credential]
 	helper = store
 
@@ -23,3 +24,6 @@
 
 [color]
   ui = auto
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

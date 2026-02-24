@@ -64,7 +64,7 @@ alias k="kubectl"
 # alias pbcopy='xclip -selection clipboard'
 
 # lsd aliases
-alias ls='lsd'
+alias ls='eza --icons --grid --group-directories-first'
 alias l='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
@@ -72,5 +72,3 @@ alias lt='ls --tree'
 
 alias cleardns="ssh router clear dns forwarding cache"
 alias randommac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
-
-#alias claude="~/.claude/local/claude"

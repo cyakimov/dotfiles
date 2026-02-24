@@ -122,6 +122,9 @@ export EDITOR=nano
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
+# Tools
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+
 # Load aliases
 [[ -f "$HOME/.zsh_aliases" ]] && source "$HOME/.zsh_aliases"
 [[ -f "$ZSH_CUSTOM/aliases.zsh" ]] && source "$ZSH_CUSTOM/aliases.zsh"
