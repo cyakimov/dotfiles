@@ -35,6 +35,15 @@
     "pyright-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true
   },
+  "sandbox": {
+    "network": {
+      "allowUnixSockets": [
+        "/Users/cyakimov/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      ]
+    }
+  },
+  "effortLevel": "medium",
+  "voiceEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754016832126
   }

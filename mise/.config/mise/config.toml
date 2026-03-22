@@ -8,6 +8,7 @@ rust = "stable"
 ruby = "latest"
 "gem:cocoapods" = "latest"
 "npm:@fission-ai/openspec" = "latest"
+just = "latest"
 
 [settings]
 experimental = true
