@@ -31,6 +31,8 @@ brew "llmfit"
 # Casks
 cask "1password-cli"
 cask "copilot-cli"
+cask "font-hack-nerd-font"
+cask "font-jetbrains-mono-nerd-font"
 cask "ghostty"
 cask "jetbrains-toolbox"
 cask "spotify"

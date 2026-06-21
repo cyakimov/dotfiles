@@ -9,6 +9,7 @@ ruby = "latest"
 "gem:cocoapods" = "latest"
 "npm:@fission-ai/openspec" = "latest"
 just = "latest"
+golangci-lint = "v2.12.0"
 
 [settings]
 experimental = true

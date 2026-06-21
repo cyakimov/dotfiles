@@ -1,9 +1,13 @@
 # Font configuration
-font-family = JetBrains Mono
+font-family = JetBrainsMono Nerd Font
 font-size = 14
+font-thicken = true
 
 # Theme
-theme = Catppuccin Mocha
+theme = dark:Catppuccin Mocha,light:Catppuccin Latte
+
+# Color fidelity
+window-colorspace = display-p3
 
 # Copy/paste improvements
 clipboard-trim-trailing-spaces = true
@@ -18,11 +22,21 @@ shell-integration = detect
 # Window settings
 window-inherit-working-directory = true
 window-inherit-font-size = true
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-save-state = always
+macos-titlebar-style = transparent
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
 
 # Mouse behavior
 mouse-hide-while-typing = true
 
-macos-option-as-alt = true
-
+# Background
 background-opacity = 0.95
 background-blur = true
+
+macos-option-as-alt = left
