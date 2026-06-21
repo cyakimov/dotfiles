@@ -17,7 +17,13 @@
       "Bash(wc:*)",
       "Bash(bun:*)",
       "Bash(go:*)",
-      "Bash(golangci-lint:*)"
+      "Bash(golangci-lint:*)",
+      "mcp__plugin_linear_linear__save_issue",
+      "mcp__plugin_linear_linear__save_comment",
+      "mcp__plugin_linear_linear__save_project",
+      "mcp__plugin_linear_linear__save_milestone",
+      "mcp__plugin_linear_linear__save_document",
+      "mcp__plugin_linear_linear__create_issue_label"
     ],
     "defaultMode": "plan"
   },
@@ -31,9 +37,22 @@
     "code-review@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "samber": {
+      "source": {
+        "source": "github",
+        "repo": "samber/cc"
+      }
+    }
   },
   "sandbox": {
     "network": {
@@ -42,7 +61,17 @@
       ]
     }
   },
-  "effortLevel": "medium",
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "switchModelsOnFlag": false,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Writes to the user's own Linear workspace via mcp__plugin_linear_linear__ tools — creating, updating, closing/resolving, and commenting on issues, projects, and milestones — carry the user's standing authorization. Deletions are excluded."
+    ]
+  },
   "voiceEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754016832126
