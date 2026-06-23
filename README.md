@@ -65,10 +65,21 @@ path = ~/.dotfiles/git/git-work.conf
 
 Then stow the `git` module from this repository so that global paths like `~/.gitignore_global` are linked into place.
 
+## macOS defaults
+Some settings are system preferences applied via `defaults` rather than symlinked files. Apply them with:
+
+```bash
+# Apply macOS system defaults (key repeat, etc.)
+./macos/defaults.sh
+```
+
+The script is idempotent and macOS-only. A logout/login (or restarting affected apps) may be needed for everything to take effect.
+
 ## Modules (examples)
 - `git` — gitconfig fragments and global gitignore
 - `zsh` — shell config and aliases (if present)
 - `mise` — tool versions/config (if present)
+- `macos` — system preferences applied via `defaults` (run `./macos/defaults.sh`)
 
 ## Troubleshooting
 - “WARNING! stowing may cause conflicts”: run `stow -n -v <module>` to preview and resolve by moving existing files aside or using `--adopt` carefully.
