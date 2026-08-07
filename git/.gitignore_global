@@ -77,3 +77,5 @@ xcuserdata/
 *.xcscmblueprint
 
 # AI
+
+**/.claude/settings.local.json

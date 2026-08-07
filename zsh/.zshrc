@@ -132,3 +132,6 @@ command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 [[ -f "$ZSH_CUSTOM/aliases.zsh" ]] && source "$ZSH_CUSTOM/aliases.zsh"
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
+
+# treepi worktree orchestrator: `tp cd <task>` and bare `tp` dashboard
+eval "$(treepi shell-init zsh)"
