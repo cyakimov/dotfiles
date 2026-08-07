@@ -28,13 +28,13 @@ stow -D git
 # 4) Restow (refresh/repair links after changes or moves):
 stow -R git
 
-# Target a different directory (e.g., XDG configs):
-stow -t ~/.config mise
+# XDG configs need no special flags: the package already contains .config/
+stow mise                 # links ~/.config/mise
 ```
 
 Notes:
 - Run Stow from the repository root.
-- Each module mirrors the target directory structure. For example, files in `git/` map to `~/.gitconfig`, `~/.gitignore_global`, etc. Files in `zsh/` would map to `~/.zshrc`, `~/.zsh_aliases`, and so on.
+- Each module mirrors the target directory structure, including the `.config/` level where applicable. For example, files in `git/` map to `~/.gitconfig`, `~/.gitignore_global`, etc. Files in `zsh/` map to `~/.zshrc`, `~/.zsh_aliases`, and `ghostty/.config/ghostty/config` maps to `~/.config/ghostty/config`.
 - Use `stow -n` (dry run) first to avoid surprises.
 
 ## Handling existing files (conflicts)
@@ -75,11 +75,14 @@ Some settings are system preferences applied via `defaults` rather than symlinke
 
 The script is idempotent and macOS-only. A logout/login (or restarting affected apps) may be needed for everything to take effect.
 
-## Modules (examples)
-- `git` — gitconfig fragments and global gitignore
-- `zsh` — shell config and aliases (if present)
-- `mise` — tool versions/config (if present)
-- `macos` — system preferences applied via `defaults` (run `./macos/defaults.sh`)
+## Modules
+- `claude` - Claude Code instructions, settings, and statusline script (`~/.claude/`)
+- `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
+- `git` - gitconfig fragments and global gitignore
+- `mise` - tool versions/config (`~/.config/mise/`)
+- `wezterm` - WezTerm terminal config (`~/.config/wezterm/`)
+- `zsh` - shell config and aliases
+- `macos` - system preferences applied via `defaults`; not stowed, run `./macos/defaults.sh` directly
 
 ## Troubleshooting
 - “WARNING! stowing may cause conflicts”: run `stow -n -v <module>` to preview and resolve by moving existing files aside or using `--adopt` carefully.
