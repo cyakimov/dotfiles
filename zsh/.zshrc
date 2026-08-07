@@ -134,4 +134,4 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 # treepi worktree orchestrator: `tp cd <task>` and bare `tp` dashboard
-eval "$(treepi shell-init zsh)"
+command -v treepi >/dev/null 2>&1 && eval "$(treepi shell-init zsh)"
