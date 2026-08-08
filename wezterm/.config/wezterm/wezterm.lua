@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local act = wezterm.action
 
 local config = wezterm.config_builder()
 
@@ -9,6 +10,32 @@ config.window_background_opacity = 0.8
 config.macos_window_background_blur = 50
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
+
+-- Mirror Ghostty's multiplexing keys so switching terminals costs no retraining.
+-- WezTerm's own defaults stay live; only CMD+w is genuinely displaced (it closed
+-- the whole tab, where Ghostty closes just the pane).
+config.keys = {
+	{ key = "d", mods = "SUPER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "d", mods = "SUPER|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "[", mods = "SUPER", action = act.ActivatePaneDirection("Prev") },
+	{ key = "]", mods = "SUPER", action = act.ActivatePaneDirection("Next") },
+	{ key = "Enter", mods = "SUPER|SHIFT", action = act.TogglePaneZoomState },
+	{ key = "w", mods = "SUPER", action = act.CloseCurrentPane({ confirm = true }) },
+	{ key = "w", mods = "SUPER|ALT", action = act.CloseCurrentTab({ confirm = true }) },
+}
+
+for _, direction in ipairs({ "Left", "Right", "Up", "Down" }) do
+	table.insert(config.keys, {
+		key = direction .. "Arrow",
+		mods = "SUPER|ALT",
+		action = act.ActivatePaneDirection(direction),
+	})
+	table.insert(config.keys, {
+		key = direction .. "Arrow",
+		mods = "SUPER|CTRL",
+		action = act.AdjustPaneSize({ direction, 10 }),
+	})
+end
 
 -- Dim unfocused windows so the focused one is obvious at a glance.
 local UNFOCUSED_FOREGROUND_TEXT_HSB = { hue = 1.0, saturation = 0.25, brightness = 0.45 }
