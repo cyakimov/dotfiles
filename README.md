@@ -30,6 +30,7 @@ stow -R git
 
 # XDG configs need no special flags: the package already contains .config/
 stow mise                 # links ~/.config/mise
+stow pi                   # links ~/.pi/agent settings and keybindings
 ```
 
 Notes:
@@ -80,6 +81,7 @@ The script is idempotent and macOS-only. A logout/login (or restarting affected 
 - `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
 - `git` - gitconfig fragments and global gitignore
 - `mise` - tool versions/config (`~/.config/mise/`)
+- `pi` - Pi agent settings and keybindings (`~/.pi/agent/`); credentials and local trust state remain untracked
 - `wezterm` - WezTerm terminal config (`~/.config/wezterm/`)
 - `zsh` - shell config and aliases
 - `macos` - system preferences applied via `defaults`; not stowed, run `./macos/defaults.sh` directly

@@ -1,0 +1,9 @@
+{
+  "app.clear": ["ctrl+c", "ctrl+l"],
+  "app.model.select": "alt+p",
+  "app.model.cycleForward": "alt+]",
+  "app.model.cycleBackward": "alt+[",
+  "tui.editor.historyPrevious": ["ctrl+p", "ctrl+r"],
+  "tui.editor.historyNext": "ctrl+n",
+  "app.tools.expand": "ctrl+o"
+}
