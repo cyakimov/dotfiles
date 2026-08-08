@@ -10,6 +10,7 @@ ruby = "latest"
 "npm:@fission-ai/openspec" = "latest"
 just = "latest"
 golangci-lint = "v2.12.0"
+"npm:@earendil-works/pi-coding-agent" = "latest"
 
 [settings]
 experimental = true
