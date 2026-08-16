@@ -4,13 +4,11 @@ tap "gromgit/brewtils"
 
 # Formulae
 brew "bat"
-brew "codex"
-brew "direnv"
 brew "eza"
 brew "fd"
 brew "fzf"
+brew "go-task"
 brew "git"
-brew "huggingface-cli"
 brew "hyperfine"
 brew "mactop"
 brew "mise"
@@ -30,6 +28,7 @@ brew "llmfit"
 
 # Casks
 cask "1password-cli"
+cask "codex"
 cask "copilot-cli"
 cask "font-hack-nerd-font"
 cask "font-jetbrains-mono-nerd-font"

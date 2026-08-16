@@ -13,11 +13,9 @@ path_dirs=(
     "$HOME/go/bin"
     "$HOME/.krew/bin"
     "/usr/local/sbin"
-    "$HOME/n/bin"
     "$HOME/bin"
     "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
     "$HOME/.local/bin"
-    "$PYENV_ROOT/bin"
     "$BUN_INSTALL/bin"
 )
 
@@ -121,7 +119,6 @@ export EDITOR=nano
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
 # Development tools initialization
-command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
 # Tools

@@ -79,6 +79,7 @@ Some settings are system preferences applied via `defaults` rather than symlinke
 The script is idempotent and macOS-only. A logout/login (or restarting affected apps) may be needed for everything to take effect.
 
 ## Modules
+- `AGENTS.md` - Canonical instructions shared by the supported agent harnesses
 - `claude` - Claude Code instructions, settings, and statusline script (`~/.claude/`)
 - `codex` - Codex configuration and agent instructions (`~/.codex/`)
 - `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
