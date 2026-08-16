@@ -31,6 +31,7 @@ stow -R git
 # XDG configs need no special flags: the package already contains .config/
 stow mise                 # links ~/.config/mise
 stow pi                   # links ~/.pi/agent settings and keybindings
+stow codex                # links ~/.codex/config.toml and AGENTS.md
 ```
 
 Notes:
@@ -78,6 +79,7 @@ The script is idempotent and macOS-only. A logout/login (or restarting affected 
 
 ## Modules
 - `claude` - Claude Code instructions, settings, and statusline script (`~/.claude/`)
+- `codex` - Codex configuration and agent instructions (`~/.codex/`)
 - `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
 - `git` - gitconfig fragments and global gitignore
 - `mise` - tool versions/config (`~/.config/mise/`)

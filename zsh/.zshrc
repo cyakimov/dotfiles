@@ -135,3 +135,9 @@ export LC_ALL=en_US.UTF-8
 
 # treepi worktree orchestrator: `tp cd <task>` and bare `tp` dashboard
 command -v treepi >/dev/null 2>&1 && eval "$(treepi shell-init zsh)"
+
+# Support Option+Arrow word navigation across common macOS terminal encodings.
+bindkey $'\e[1;3D' backward-word
+bindkey $'\e[1;3C' forward-word
+bindkey $'\e\e[D' backward-word
+bindkey $'\e\e[C' forward-word

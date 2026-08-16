@@ -10,6 +10,7 @@ config.window_background_opacity = 0.8
 config.macos_window_background_blur = 50
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
+config.enable_scroll_bar = true
 
 -- Mirror Ghostty's multiplexing keys so switching terminals costs no retraining.
 -- WezTerm's own defaults stay live; only CMD+w is genuinely displaced (it closed
