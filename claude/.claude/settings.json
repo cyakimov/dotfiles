@@ -7,12 +7,10 @@
       "Bash(curl:*)",
       "Bash(pkill:*)",
       "Bash(lsof:*)",
-      "Bash(xargs:*)",
       "Bash(ls:*)",
       "Bash(make:*)",
       "Bash(docker:*)",
       "Bash(docker-compose:*)",
-      "Bash(python3:*)",
       "Bash(overmind:*)",
       "Bash(wc:*)",
       "Bash(bun:*)",
@@ -25,8 +23,9 @@
       "mcp__plugin_linear_linear__save_document",
       "mcp__plugin_linear_linear__create_issue_label"
     ],
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
+  "model": "claude-fable-5",
   "statusLine": {
     "type": "command",
     "command": "bash /Users/cyakimov/.claude/statusline-command.sh"
@@ -72,6 +71,32 @@
     "allow": [
       "$defaults",
       "Writes to the user's own Linear workspace via mcp__plugin_linear_linear__ tools — creating, updating, closing/resolving, and commenting on issues, projects, and milestones — carry the user's standing authorization. Deletions are excluded."
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: assume private (no remote configured for this repo; visibility not queryable via gh)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured",
+      "**Default / protected branches**: unknown — origin/HEAD unset, no remote configured, not queryable via gh",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo (this local checkout, no remotes configured) — no additional orgs configured",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited)",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (Rust distributed block storage project, midichlorian)",
+      "**Trusted repo**: The git repository at /Users/cyakimov/Development/Personal/midichlorian (its working directory) — no remotes are configured, so no push destination is trusted beyond the local checkout",
+      "**Org-specific CLIs**: None configured",
+      "No \"routine under <user>/ prefix\" qualifiers found"
     ]
   },
   "voiceEnabled": false,
