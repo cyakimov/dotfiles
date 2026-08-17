@@ -11,7 +11,6 @@ BUN_INSTALL="$HOME/.bun"
 # Consolidate all PATH modifications for better performance
 path_dirs=(
     "$HOME/go/bin"
-    "$HOME/.krew/bin"
     "/usr/local/sbin"
     "$HOME/bin"
     "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
@@ -19,14 +18,16 @@ path_dirs=(
     "$BUN_INSTALL/bin"
 )
 
-# Add existing PATH directories to our array
+# Add existing PATH directories while keeping PATH unique.
+typeset -U path PATH
+path=("${(@)path:#$HOME/.krew/bin}")
 for dir in "${path_dirs[@]}"; do
-    [[ -d "$dir" ]] && PATH="$dir:$PATH"
+    [[ -d "$dir" ]] && path=("$dir" $path)
 done
-export PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+fpath=("${(@)fpath:#$ZSH/plugins/kubectl}")
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -57,7 +58,6 @@ plugins=(
     history-substring-search
     colored-man-pages
     zsh-autosuggestions
-    kubectl
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -113,13 +113,15 @@ export EDITOR=nano
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # FZF fuzzy finder integration
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 
 # Lazy load heavy tools for better performance
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
 # Development tools initialization
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+path=("${(@)path:#$HOME/.krew/bin}")
+fpath=("${(@)fpath:#$ZSH/plugins/kubectl}")
 
 # Tools
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"

@@ -30,6 +30,7 @@ stow -R git
 
 # XDG configs need no special flags: the package already contains .config/
 stow mise                 # links ~/.config/mise
+stow shell                # links login shells and Powerlevel10k config
 stow herdr                # links ~/.config/herdr/config.toml
 stow pi                   # links ~/.pi/agent settings, keybindings, and AGENTS.md
 stow codex                # links ~/.codex/config.toml and AGENTS.md
@@ -86,6 +87,7 @@ The script is idempotent and macOS-only. A logout/login (or restarting affected 
 - `herdr` - Herdr terminal workspace manager config (`~/.config/herdr/config.toml`)
 - `git` - gitconfig fragments and global gitignore
 - `mise` - tool versions/config (`~/.config/mise/`)
+- `shell` - Bash, profile, Zsh login, and Powerlevel10k configuration
 - `pi` - Pi agent settings, keybindings, and global instructions (`~/.pi/agent/`); credentials and local trust state remain untracked
 - `wezterm` - WezTerm terminal config (`~/.config/wezterm/`)
 - `zsh` - shell config and aliases

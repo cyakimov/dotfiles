@@ -60,7 +60,6 @@ dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/[
 dbash() { docker exec -it $(docker ps -aqf "name=$1") bash; }
 
 # other
-alias k="kubectl"
 # alias pbcopy='xclip -selection clipboard'
 
 # lsd aliases
