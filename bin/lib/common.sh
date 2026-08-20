@@ -49,6 +49,10 @@ load_nix_environment() {
   fi
 }
 
+nix_flakes() {
+  nix --extra-experimental-features "nix-command flakes" "$@"
+}
+
 canonical_existing_path() {
   local path=$1
   local link

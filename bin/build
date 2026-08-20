@@ -13,9 +13,9 @@ require_command nix
 [[ -f $DOTFILES_ROOT/flake.lock ]] || die "flake.lock is missing. Generate and review it before building."
 
 say "Checking the locked flake without changing the system..."
-nix flake check --no-write-lock-file "$DOTFILES_ROOT"
+nix_flakes flake check --no-write-lock-file "$DOTFILES_ROOT"
 
 say "Building the nix-darwin system without creating a result link..."
-nix build --no-link --print-out-paths "$DOTFILES_ROOT#darwinConfigurations.shared-macos.system"
+nix_flakes build --no-link --print-out-paths "$DOTFILES_ROOT#darwinConfigurations.shared-macos.system"
 
 say "Build completed. Nothing was activated."

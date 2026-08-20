@@ -44,7 +44,7 @@ restore_lock() {
 }
 trap restore_lock EXIT
 
-nix flake update --flake "$DOTFILES_ROOT"
+nix_flakes flake update --flake "$DOTFILES_ROOT"
 "$DOTFILES_ROOT/bin/build"
 
 if $had_lock; then
