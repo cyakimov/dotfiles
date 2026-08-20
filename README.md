@@ -32,6 +32,7 @@ stow -R git
 stow mise                 # links ~/.config/mise
 stow shell                # links login shells and Powerlevel10k config
 stow herdr                # links ~/.config/herdr/config.toml
+stow tmux                 # links ~/.tmux.conf
 stow pi                   # links ~/.pi/agent settings, keybindings, and AGENTS.md
 stow codex                # links ~/.codex/config.toml and AGENTS.md
 ```
@@ -85,6 +86,7 @@ The script is idempotent and macOS-only. A logout/login (or restarting affected 
 - `codex` - Codex configuration and agent instructions (`~/.codex/`)
 - `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
 - `herdr` - Herdr terminal workspace manager config (`~/.config/herdr/config.toml`)
+- `tmux` - tmux configuration (`~/.tmux.conf`)
 - `git` - gitconfig fragments and global gitignore
 - `mise` - tool versions/config (`~/.config/mise/`)
 - `shell` - Bash, profile, Zsh login, and Powerlevel10k configuration
