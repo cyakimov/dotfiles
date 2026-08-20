@@ -2,10 +2,15 @@
 
 set -euo pipefail
 
-[[ $# -eq 0 ]] || {
-  printf 'error: Usage: bin/check\n' >&2
+[[ $# -le 1 ]] || {
+  printf 'error: Usage: bin/check [personal|work]\n' >&2
   exit 1
 }
+profile=${1:-}
+case $profile in
+  "" | personal | work) ;;
+  *) printf 'error: Usage: bin/check [personal|work]\n' >&2; exit 1 ;;
+esac
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 if ! command -v nix >/dev/null 2>&1 && [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
@@ -24,5 +29,12 @@ command -v nix >/dev/null 2>&1 || {
   exit 1
 }
 
-nix --extra-experimental-features "nix-command flakes" \
-  flake check --no-write-lock-file "$root"
+if [[ -z $profile ]]; then
+  nix --extra-experimental-features "nix-command flakes" \
+    flake check --no-write-lock-file "$root"
+else
+  nix --extra-experimental-features "nix-command flakes" \
+    build --no-link --no-write-lock-file \
+    "$root#checks.aarch64-darwin.static" \
+    "$root#checks.aarch64-darwin.$profile"
+fi

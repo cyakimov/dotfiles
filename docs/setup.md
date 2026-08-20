@@ -24,13 +24,14 @@ bin/bootstrap --apply
 
 Open a new terminal after Nix installation.
 
-## 3. Check both profiles
+## 3. Check the target profile
 
 ```bash
-bin/check
+bin/check personal
 ```
 
-This performs static validation and builds both the personal and work systems without activating either one.
+Use `bin/check work` on a work Mac.
+Running `bin/check` without an argument performs static validation and builds both systems.
 
 ## 4. Configure work identity
 

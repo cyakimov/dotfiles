@@ -3,6 +3,10 @@
 set -euo pipefail
 
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
+[[ $# -eq 1 ]] || {
+  printf 'error: Usage: bin/switch <personal|work>\n' >&2
+  exit 1
+}
 host=${1:-}
 case $host in
   personal | work) ;;
@@ -29,7 +33,7 @@ command -v nix >/dev/null 2>&1 || {
   exit 1
 }
 
-"$root/bin/check"
+"$root/bin/check" "$host"
 system_path=$(nix --extra-experimental-features "nix-command flakes" \
   build --no-link --print-out-paths "$root#darwinConfigurations.$host.system")
 rebuild=$system_path/sw/bin/darwin-rebuild
