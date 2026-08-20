@@ -11,7 +11,6 @@ _: {
     taps = [ "gromgit/brewtils" ];
 
     brews = [
-      "herdr"
       "mactop"
       "mole"
       {

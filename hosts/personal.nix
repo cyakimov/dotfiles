@@ -1,4 +1,13 @@
 {
+  inputs,
+  pkgs,
+  ...
+}:
+{
+  home-manager.users.cyakimov.home.packages = [
+    inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
+  ];
+
   homebrew.casks = [
     "1password-cli"
     "appcleaner"

@@ -4,12 +4,13 @@
 
 Both profiles install Bruno, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, UnnaturalScrollWheels, and WezTerm through Homebrew.
 
-The personal profile additionally installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Codex, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom.
+The personal profile additionally installs Herdr from its official release flake.
+It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Codex, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
 
 The work profile additionally installs only Google Cloud CLI.
 Slack is not declared in either profile.
 
-The shared Homebrew formula exceptions are Herdr, mactop, Mole, and the explicitly trusted Taproom formula.
+The shared Homebrew formula exceptions are mactop, Mole, and the explicitly trusted Taproom formula.
 All other command-line tools belong in `nix/packages.nix`.
 
 ## Update dependencies
