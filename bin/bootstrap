@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=bin/lib/common.sh
+. "$SCRIPT_DIR/lib/common.sh"
+
+apply=false
+case ${1:-} in
+  "") ;;
+  --apply) apply=true ;;
+  *) die "Usage: bin/bootstrap [--apply]" ;;
+esac
+
+require_apple_silicon_macos
+
+say "Bootstrap scope:"
+say "  - Install Homebrew from brew.sh if it is absent."
+say "  - Install multi-user Nix from nixos.org if it is absent."
+say "  - Do not activate nix-darwin."
+say "  - Do not unlink files or uninstall legacy tools."
+
+if ! $apply; then
+  say ""
+  say "Dry run only. Re-run with --apply to install missing prerequisites."
+  exit 0
+fi
+
+free_kib=$(df -Pk / | awk 'NR == 2 { print $4 }')
+[[ $free_kib =~ ^[0-9]+$ ]] || die "Could not determine available disk space."
+(( free_kib >= 20971520 )) || die "At least 20 GiB of free disk space is required."
+
+require_command curl
+
+temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-bootstrap.XXXXXX")
+cleanup_temp() {
+  /bin/rm -f "$temp_dir/homebrew-install.sh" "$temp_dir/nix-install.sh"
+  /bin/rmdir "$temp_dir" 2>/dev/null || true
+}
+trap cleanup_temp EXIT
+
+if command -v brew >/dev/null 2>&1; then
+  say "Homebrew is already installed: $(command -v brew)"
+else
+  say "Downloading the official Homebrew installer for interactive review..."
+  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$temp_dir/homebrew-install.sh"
+  /bin/bash "$temp_dir/homebrew-install.sh"
+fi
+
+load_nix_environment
+if command -v nix >/dev/null 2>&1; then
+  say "Nix is already installed: $(command -v nix)"
+else
+  say "Downloading the official multi-user Nix installer..."
+  curl -fsSL https://nixos.org/nix/install -o "$temp_dir/nix-install.sh"
+  /bin/sh "$temp_dir/nix-install.sh" --daemon
+fi
+
+say ""
+say "Prerequisite installation completed."
+say "Review and explicitly trust the third-party Taproom formula as documented in docs/migration.md."
+say "Open a new shell, generate and review flake.lock if needed, then run bin/build."
+say "No system generation was activated."

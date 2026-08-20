@@ -1,104 +1,158 @@
-<h1 align="center">dotfiles</h1>
+# dotfiles
 
-Minimal, versioned dotfiles for development environments. Each top‑level folder is a module (e.g., `git`, `zsh`, `mise`) whose contents are symlinked into place using GNU Stow.
+Declarative Apple Silicon macOS environments powered by Nix flakes, nix-darwin, Home Manager, and a deliberately narrow Homebrew layer.
 
-## Prerequisites
-- GNU Stow installed (`stow` command in your PATH)
+This repository is designed to be shared unchanged between Carlos's personal and work Macs.
+Machine-local identities, credentials, trust decisions, generated app state, and employer-specific data stay outside Git.
 
-Install Stow:
-- macOS (Homebrew): `brew install stow`
-- Debian/Ubuntu: `sudo apt-get install stow`
-- Fedora: `sudo dnf install stow`
+## Safety status
 
-## Quick start
+Repository work is safe to review without changing macOS.
+Nothing is installed or activated by cloning the repository or running the default forms of its scripts.
+Commands that change the machine require an explicit `--apply` flag.
+
+The first activation is intentionally separate from legacy cleanup.
+Homebrew cleanup is set to `none`, Nix garbage collection is disabled during migration, and old Mise and Homebrew tools remain available for a 30-day proving period.
+
+Do not merge the migration branch into the live Stow checkout before the first switch succeeds from the isolated worktree.
+Merging first would remove source files that active Stow links still need.
+
+Read [the migration runbook](docs/migration.md) before the first activation.
+Keep [the recovery runbook](docs/recovery.md) available in another terminal or device.
+
+## Supported environment
+
+- Apple Silicon macOS
+- User account `cyakimov`
+- Existing `/bin/zsh` login shell
+- Official multi-user Nix installation
+- Homebrew installed in `/opt/homebrew`
+
+The flake deliberately asserts these assumptions instead of guessing.
+Adding Linux, Intel macOS, or a different user should be a separate reviewed change.
+
+## Target repository structure
+
+```text
+.
+├── AGENTS.md
+├── README.md
+├── flake.nix
+├── flake.lock
+├── bin/
+│   ├── audit
+│   ├── bootstrap
+│   ├── build
+│   ├── cleanup-legacy
+│   ├── purge-legacy
+│   ├── rollback
+│   ├── switch
+│   ├── update
+│   └── verify
+├── config/
+│   ├── agents/
+│   ├── git/
+│   ├── herdr/
+│   ├── pi/
+│   ├── shell/
+│   ├── terminals/
+│   └── tmux/
+├── docs/
+│   ├── migration.md
+│   └── recovery.md
+├── migration/
+│   ├── adoptable-targets.tsv
+│   ├── homebrew-formulae.txt
+│   ├── home-manager-targets.txt
+│   ├── legacy-links.tsv
+│   ├── mise-tools.txt
+│   └── replacement-commands.tsv
+├── nix/
+│   ├── darwin.nix
+│   ├── home.nix
+│   ├── homebrew.nix
+│   ├── packages.nix
+│   └── modules/
+├── templates/
+│   ├── agents/
+│   └── git/
+└── tests/
+```
+
+`flake.lock` is required before building or activating.
+On the migration branch it is generated only after Nix is available, then reviewed and committed like source code.
+
+## Ownership model
+
+Nix owns portable command-line tools, language runtimes, shell integration, Git configuration, terminal configuration, tmux, and stable agent resources.
+
+Homebrew owns GUI applications, fonts, and four reviewed macOS exceptions: Herdr, mactop, Mole, and Taproom.
+The nix-darwin Homebrew module never removes unlisted packages because `homebrew.onActivation.cleanup` is `none`.
+Taproom requires a narrow, explicit Homebrew trust decision documented in the migration runbook.
+
+Mutable Claude, Codex, and Pi settings stay as local regular files.
+Sanitized templates seed a fresh machine only when those settings do not already exist.
+
+Work Git identity belongs in `~/.config/git/work.inc`.
+Start from `templates/git/work.inc.example` and never commit the resulting local file.
+
+Project-local Mise configuration can coexist during the transition.
+The shell ignores the retired global Mise config but still allows project-local `mise.toml` or `.tool-versions` files to activate.
+
+## Normal workflow
+
+Every command below is non-mutating unless it includes `--apply`.
+
 ```bash
-# clone
-git clone https://github.com/cyakimov/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# 1) Preview (no changes):
-stow -n -v git            # shows what would be linked
-
-# 2) Apply to $HOME (default target):
-stow git                  # link git configs into ~
-
-# 3) Unstow (remove created symlinks):
-stow -D git
-
-# 4) Restow (refresh/repair links after changes or moves):
-stow -R git
-
-# XDG configs need no special flags: the package already contains .config/
-stow mise                 # links ~/.config/mise
-stow shell                # links login shells and Powerlevel10k config
-stow herdr                # links ~/.config/herdr/config.toml
-stow tmux                 # links ~/.tmux.conf
-stow pi                   # links ~/.pi/agent settings, keybindings, and AGENTS.md
-stow codex                # links ~/.codex/config.toml and AGENTS.md
+bin/audit
+bin/bootstrap
+bin/verify
+bin/switch
 ```
 
-Notes:
-- Run Stow from the repository root.
-- Each module mirrors the target directory structure, including the `.config/` level where applicable. For example, files in `git/` map to `~/.gitconfig`, `~/.gitignore_global`, etc. Files in `zsh/` map to `~/.zshrc`, `~/.zsh_aliases`, and `ghostty/.config/ghostty/config` maps to `~/.config/ghostty/config`.
-- Use `stow -n` (dry run) first to avoid surprises.
-
-## Handling existing files (conflicts)
-If Stow reports conflicts (because a regular file already exists where a symlink would go):
-- Back up or remove the existing file, then restow: `mv ~/.gitconfig ~/.gitconfig.bak && stow -R git`
-- Advanced: `stow --adopt git` can “adopt” existing files into the repo by turning them into symlinks. Use with caution and review changes.
-
-## Verify
-- List links: `ls -l ~/.gitconfig ~/.gitignore_global`
-- Show where a symlink points: `readlink -f ~/.gitconfig` (Linux) or `greadlink -f ~/.gitconfig` (macOS with coreutils)
-
-## Git profiles in this repo
-This repo includes two example Git profiles you can opt into:
-- `git/git-personal.conf`
-- `git/git-work.conf`
-
-You can include one (or both conditionally) from your `~/.gitconfig` using Git’s includeIf rules. Example patterns:
-
-```
-# ~/.gitconfig
-[include]
-path = ~/.dotfiles/git/git-personal.conf
-
-# Optionally include work settings only in specific directories
-[includeIf "gitdir:~/work/"]
-path = ~/.dotfiles/git/git-work.conf
-```
-
-Then stow the `git` module from this repository so that global paths like `~/.gitignore_global` are linked into place.
-
-## macOS defaults
-Some settings are system preferences applied via `defaults` rather than symlinked files. Apply them with:
+The initial setup sequence is:
 
 ```bash
-# Apply macOS system defaults (key repeat, etc.)
-./macos/defaults.sh
+bin/bootstrap --apply
+# Open a new shell after Nix installation.
+bin/update --apply
+git add flake.lock
+git commit -m "chore: lock Nix inputs"
+bin/build
+bin/switch
+bin/switch --apply
 ```
 
-The script is idempotent and macOS-only. A logout/login (or restarting affected apps) may be needed for everything to take effect.
+`bin/update --apply` changes only `flake.lock` and proves that the candidate builds.
+`bin/build` evaluates and builds without creating a system generation.
+`bin/switch` previews home-path migration and activation.
+`bin/switch --apply` creates a local Time Machine snapshot, preserves existing settings, and activates only after a successful build.
 
-## Modules
-- `AGENTS.md` - Canonical instructions shared by the supported agent harnesses
-- `claude` - Claude Code instructions, settings, and statusline script (`~/.claude/`)
-- `codex` - Codex configuration and agent instructions (`~/.codex/`)
-- `ghostty` - Ghostty terminal config (`~/.config/ghostty/`)
-- `herdr` - Herdr terminal workspace manager config (`~/.config/herdr/config.toml`)
-- `tmux` - tmux configuration (`~/.tmux.conf`)
-- `git` - gitconfig fragments and global gitignore
-- `mise` - tool versions/config (`~/.config/mise/`)
-- `shell` - Bash, profile, Zsh login, and Powerlevel10k configuration
-- `pi` - Pi agent settings, keybindings, and global instructions (`~/.pi/agent/`); credentials and local trust state remain untracked
-- `wezterm` - WezTerm terminal config (`~/.config/wezterm/`)
-- `zsh` - shell config and aliases
-- `macos` - system preferences applied via `defaults`; not stowed, run `./macos/defaults.sh` directly
+After a successful personal-Mac canary, wait at least seven days before applying the same committed revision to the work Mac.
+Wait at least 30 days on each Mac before running `bin/cleanup-legacy --apply`.
 
-## Troubleshooting
-- “WARNING! stowing may cause conflicts”: run `stow -n -v <module>` to preview and resolve by moving existing files aside or using `--adopt` carefully.
-- Nothing happened? Ensure you’re running `stow` from the repo root and the module directory exists.
-- Targeting another home: use `-t` to specify the destination directory.
+## Updating
 
-## License
-Personal use; feel free to reference, but review before adopting as-is.
+Run updates on the personal Mac first.
+
+```bash
+bin/update --apply
+git diff -- flake.lock
+bin/build
+```
+
+Commit the reviewed lock-file change before activation.
+Do not combine a broad dependency update with unrelated configuration changes.
+
+## What this repository refuses to automate
+
+- Emptying the Trash
+- Uninstalling Nix itself
+- Removing project-local Mise configuration
+- Removing unrelated Homebrew packages or casks
+- Trusting third-party Homebrew formulae
+- Changing the login shell away from `/bin/zsh`
+- Writing work credentials or identities into the public repository
+- Running Nix garbage collection during the migration proving period
+
+Those boundaries keep recovery possible and make personal and work machines predictable.

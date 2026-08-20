@@ -1,0 +1,55 @@
+{
+  inputs,
+  pkgs,
+  ...
+}:
+with pkgs;
+[
+  bat
+  bun
+  buf
+  cargo
+  clippy
+  cmake
+  colima
+  docker-client
+  docker-compose
+  eza
+  fd
+  gh
+  go_1_25
+  golangci-lint
+  gopls
+  grpcurl
+  hyperfine
+  jq
+  just
+  lazygit
+  go-migrate
+  mkcert
+  # Keep project-local Mise configs working while global tool ownership moves to Nix.
+  mise
+  ncdu
+  neovim
+  nodejs_latest
+  overmind
+  pre-commit
+  protobuf
+  protoc-gen-connect-go
+  protoc-gen-go
+  protoc-gen-go-grpc
+  python311
+  ripgrep
+  ruby_4_0
+  rustc
+  rustfmt
+  shellcheck
+  sqlc
+  tokei
+  tree
+  trivy
+  uv
+  watch
+  inputs.openspec.packages.${pkgs.system}.default
+  inputs.pi.packages.${pkgs.system}.coding-agent
+]

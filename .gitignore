@@ -4,5 +4,8 @@
 .env.*
 .envrc
 .direnv/
+.result
+result
+result-*
 .idea/
 *.local.toml

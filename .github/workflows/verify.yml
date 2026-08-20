@@ -1,0 +1,35 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - feat/nix-darwin-migration
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: macos-15
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install static analysis tools
+        run: brew install jq shellcheck
+
+      - name: Run repository safety checks
+        run: bin/verify
+
+      - name: Require a committed lock file
+        run: test -f flake.lock
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@630ae543ea3a38a9a4166f03376c02c50f408342
+
+      - name: Evaluate and build the locked system
+        run: bin/build

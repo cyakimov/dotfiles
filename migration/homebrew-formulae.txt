@@ -1,0 +1,19 @@
+# Formulae declared by the legacy Brewfile and replaced by Nix.
+bat
+colima
+docker-compose
+docker
+eza
+fd
+fzf
+git
+hyperfine
+mise
+ncdu
+ripgrep
+stow
+tmux
+tokei
+tree
+watch
+zoxide

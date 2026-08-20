@@ -1,0 +1,23 @@
+# mode	home-relative target	legacy repository source
+managed	.bashrc	shell/.bashrc
+managed	.profile	shell/.profile
+managed	.zprofile	shell/.zprofile
+managed	.p10k.zsh	shell/.p10k.zsh
+managed	.zshrc	zsh/.zshrc
+managed	.zsh_aliases	zsh/.zsh_aliases
+managed	.tmux.conf	tmux/.tmux.conf
+managed	.gitconfig	git/.gitconfig
+managed	.gitignore_global	git/.gitignore_global
+managed	git-personal.conf	git/git-personal.conf
+managed	.config/ghostty/config	ghostty/.config/ghostty/config
+managed	.config/herdr/config.toml	herdr/.config/herdr/config.toml
+managed	.config/wezterm/wezterm.lua	wezterm/.config/wezterm/wezterm.lua
+managed	.claude/CLAUDE.md	claude/.claude/CLAUDE.md
+managed	.claude/statusline-command.sh	claude/.claude/statusline-command.sh
+managed	.codex/AGENTS.md	codex/.codex/AGENTS.md
+managed	.pi/agent/AGENTS.md	pi/.pi/agent/AGENTS.md
+managed	.pi/agent/keybindings.json	pi/.pi/agent/keybindings.json
+mutable	.claude/settings.json	claude/.claude/settings.json
+mutable	.codex/config.toml	codex/.codex/config.toml
+mutable	.pi/agent/settings.json	pi/.pi/agent/settings.json
+legacy	.config/mise/config.toml	mise/.config/mise/config.toml

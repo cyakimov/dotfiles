@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=bin/lib/common.sh
+. "$SCRIPT_DIR/lib/common.sh"
+
+strict=false
+if [[ ${1:-} == "--strict" ]]; then
+  strict=true
+elif [[ $# -gt 0 ]]; then
+  die "Usage: bin/audit [--strict]"
+fi
+
+problems=0
+
+check() {
+  local label=$1
+  local value=$2
+  printf '%-30s %s\n' "$label" "$value"
+}
+
+problem() {
+  problems=$((problems + 1))
+  check "$1" "$2"
+}
+
+say "Host"
+check "OS" "$(uname -s)"
+check "Architecture" "$(uname -m)"
+check "User" "$(id -un)"
+check "Login shell" "${SHELL:-unknown}"
+check "Repository" "$DOTFILES_ROOT"
+check "Branch" "$(git -C "$DOTFILES_ROOT" branch --show-current 2>/dev/null || printf unknown)"
+check "Worktree clean" "$(managed_branch_is_clean && printf yes || printf no)"
+
+say ""
+say "Managers"
+for manager in nix darwin-rebuild home-manager brew stow mise; do
+  if command -v "$manager" >/dev/null 2>&1; then
+    check "$manager" "$(command -v "$manager")"
+  else
+    check "$manager" "not installed"
+  fi
+done
+
+if homebrew_taproom_is_trusted; then
+  check "Taproom formula trust" "present"
+else
+  problem "Taproom formula trust" "missing - activation is blocked"
+fi
+
+if [[ -f $DOTFILES_ROOT/flake.lock ]]; then
+  check "flake.lock" "present"
+else
+  problem "flake.lock" "missing - activation is blocked"
+fi
+
+say ""
+say "Legacy and managed home paths"
+while IFS=$'\t' read -r mode relative source; do
+  [[ -n ${mode:-} && $mode != \#* ]] || continue
+  target=$HOME/$relative
+  expected=$HOME/dotfiles/$source
+
+  if [[ -L $target ]]; then
+    actual_resolved=$(canonical_existing_path "$target" 2>/dev/null || printf dangling)
+    expected_resolved=$(canonical_existing_path "$expected" 2>/dev/null || printf missing)
+    if [[ $actual_resolved == "$expected_resolved" ]]; then
+      check "$relative" "legacy link ($mode)"
+    elif [[ $actual_resolved == /nix/store/* ]]; then
+      check "$relative" "Home Manager"
+    else
+      problem "$relative" "foreign or dangling link"
+    fi
+  elif [[ -e $target ]]; then
+    actual_resolved=$(canonical_existing_path "$target" 2>/dev/null || printf missing)
+    expected_resolved=$(canonical_existing_path "$expected" 2>/dev/null || printf missing)
+    if [[ $actual_resolved == "$expected_resolved" ]] && nearest_symlink_ancestor "$target" >/dev/null; then
+      check "$relative" "legacy folded link ($mode)"
+    elif [[ $mode == "mutable" || $mode == "legacy" ]]; then
+      check "$relative" "local regular file ($mode)"
+    else
+      problem "$relative" "unmanaged regular path"
+    fi
+  else
+    check "$relative" "absent"
+  fi
+done < "$DOTFILES_ROOT/migration/legacy-links.tsv"
+
+while IFS=$'\t' read -r strategy relative; do
+  [[ -n ${strategy:-} && $strategy != \#* ]] || continue
+  target=$HOME/$relative
+
+  if [[ -L $target ]] && is_nix_owned_path "$target"; then
+    check "$relative" "Home Manager"
+  elif [[ $strategy == "empty" && -f $target && ! -L $target && ! -s $target ]]; then
+    check "$relative" "empty local file ready for adoption"
+  elif [[ ! -e $target && ! -L $target ]]; then
+    check "$relative" "absent"
+  else
+    problem "$relative" "does not match adoption strategy: $strategy"
+  fi
+done < "$DOTFILES_ROOT/migration/adoptable-targets.tsv"
+
+if [[ -f $DOTFILES_STATE_ROOT/current/activated-at ]]; then
+  say ""
+  say "Home Manager activation targets"
+  while IFS= read -r relative; do
+    [[ -n $relative && $relative != \#* ]] || continue
+    target=$HOME/$relative
+    if [[ -L $target ]] && is_nix_owned_path "$target"; then
+      check "$relative" "Home Manager"
+    else
+      problem "$relative" "missing or not Nix-owned"
+    fi
+  done < "$DOTFILES_ROOT/migration/home-manager-targets.txt"
+fi
+
+say ""
+say "Replacement command providers"
+while IFS=$'\t' read -r provider command_name; do
+  [[ -n ${provider:-} && $provider != \#* ]] || continue
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    check "$command_name" "absent (expected $provider after activation)"
+    continue
+  fi
+
+  command_path=$(command -v "$command_name")
+  if [[ $provider == "nix" ]] && is_nix_owned_path "$command_path"; then
+    check "$command_name" "nix"
+  elif [[ $provider == "brew" && $command_path == /opt/homebrew/* ]]; then
+    check "$command_name" "homebrew"
+  else
+    check "$command_name" "$command_path (legacy or unrelated)"
+  fi
+done < "$DOTFILES_ROOT/migration/replacement-commands.tsv"
+
+say ""
+if (( problems == 0 )); then
+  say "Audit completed without structural problems."
+else
+  say "Audit found $problems structural problem(s)."
+fi
+
+if $strict && (( problems > 0 )); then
+  exit 1
+fi

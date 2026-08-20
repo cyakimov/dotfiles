@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+# shellcheck source=bin/lib/common.sh
+. "$SCRIPT_DIR/lib/common.sh"
+
+apply=false
+case ${1:-} in
+  "") ;;
+  --apply) apply=true ;;
+  *) die "Usage: bin/update [--apply]" ;;
+esac
+
+require_apple_silicon_macos
+load_nix_environment
+require_command nix
+
+say "This updates flake.lock and runs the full non-activating build."
+say "It does not switch the system generation or clean up legacy tools."
+
+if ! $apply; then
+  say "Dry run only. Re-run with --apply to update the lock file."
+  exit 0
+fi
+
+managed_branch_is_clean || die "Refusing to update a dirty checkout. Commit or stash other work first."
+
+temporary_lock=$DOTFILES_ROOT/.flake.lock.before-update.$$
+had_lock=false
+if [[ -f $DOTFILES_ROOT/flake.lock ]]; then
+  cp -p "$DOTFILES_ROOT/flake.lock" "$temporary_lock"
+  had_lock=true
+fi
+
+restore_lock() {
+  if $had_lock; then
+    mv "$temporary_lock" "$DOTFILES_ROOT/flake.lock"
+  else
+    /bin/rm -f "$DOTFILES_ROOT/flake.lock"
+  fi
+  warn "The update failed, so the previous lock file was restored."
+}
+trap restore_lock EXIT
+
+nix flake update --flake "$DOTFILES_ROOT"
+"$DOTFILES_ROOT/bin/build"
+
+if $had_lock; then
+  /bin/rm -f "$temporary_lock"
+fi
+trap - EXIT
+
+say "flake.lock was updated and the candidate system built successfully."
+say "Review and commit the lock-file diff before any activation."
