@@ -4,7 +4,7 @@ _: {
 
     onActivation = {
       autoUpdate = false;
-      cleanup = "none";
+      cleanup = "uninstall";
       upgrade = false;
     };
 
@@ -14,20 +14,19 @@ _: {
       "herdr"
       "mactop"
       "mole"
-      "gromgit/brewtils/taproom"
+      {
+        name = "gromgit/brewtils/taproom";
+        trusted = true;
+      }
     ];
 
     casks = [
-      "1password-cli"
-      "codex"
-      "copilot-cli"
+      "bruno"
       "font-hack-nerd-font"
       "font-jetbrains-mono-nerd-font"
       "ghostty"
-      "jetbrains-toolbox"
-      "spotify"
       "unnaturalscrollwheels"
-      "visual-studio-code"
+      "wezterm"
     ];
   };
 }

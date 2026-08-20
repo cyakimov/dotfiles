@@ -5,34 +5,46 @@
 }:
 with pkgs;
 [
+  air
+  atlas
   bat
   bun
   buf
   cargo
   clippy
   cmake
+  civo
+  claude-code
   colima
   docker-client
   docker-compose
   eza
+  eas-cli
+  esp-generate
+  espflash
+  fastfetch
   fd
   gh
   go_1_25
+  go-tools
   golangci-lint
   gopls
   grpcurl
+  gws
+  htop
   hyperfine
   jq
   just
   lazygit
   go-migrate
   mkcert
-  # Keep project-local Mise configs working while global tool ownership moves to Nix.
-  mise
   ncdu
   neovim
+  nilaway
+  nmap
   nodejs_latest
   overmind
+  oapi-codegen
   # Nixpkgs' install tests pull unrelated language toolchains that are not runtime dependencies.
   (pre-commit.overridePythonAttrs (_: {
     doCheck = false;
@@ -49,12 +61,20 @@ with pkgs;
   rustc
   rustfmt
   shellcheck
+  sipcalc
   sqlc
+  supabase-cli
+  templ
   tokei
   tree
+  tree-sitter
   trivy
+  turso-cli
   uv
   watch
+  wire
+  xk6
+  yazi
   (pkgs.callPackage ./packages/openspec.nix { src = inputs.openspec; })
   inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
 ]

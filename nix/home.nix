@@ -22,9 +22,7 @@
     sessionPath = [
       "/etc/profiles/per-user/cyakimov/bin"
       "/run/current-system/sw/bin"
-      "$HOME/.local/bin"
       "$HOME/bin"
-      "$HOME/go/bin"
       "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
       "/opt/homebrew/bin"
       "/opt/homebrew/sbin"
@@ -36,14 +34,11 @@
       GOPATH = "/Users/cyakimov/go";
       LANG = "en_US.UTF-8";
       LC_ALL = "en_US.UTF-8";
-      MISE_GLOBAL_CONFIG_FILE = "/Users/cyakimov/.config/mise/nix-global.toml";
       VISUAL = "nano";
     };
   };
 
   home.file.".docker/cli-plugins/docker-compose".source = "${pkgs.docker-compose}/bin/docker-compose";
-
-  programs.home-manager.enable = true;
 
   xdg.enable = true;
 

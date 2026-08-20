@@ -5,6 +5,18 @@
 input=$(cat)
 
 SEP=$(printf "\033[2m · \033[0m")
+project_dir=""
+cwd=""
+model=""
+model_id=""
+session_name=""
+used_pct=0
+vim_mode=""
+duration_ms=0
+lines_added=0
+lines_removed=0
+worktree_name=""
+worktree_branch=""
 
 # --- Extract all fields in a single jq call ---
 eval "$(echo "$input" | jq -r '
@@ -14,8 +26,6 @@ eval "$(echo "$input" | jq -r '
   "model_id=" + (.model.id // "" | @sh),
   "session_name=" + (.session_name // "" | @sh),
   "used_pct=" + (.context_window.used_percentage // 0 | tostring | @sh),
-  "total_input=" + (.context_window.total_input_tokens // 0 | tostring | @sh),
-  "total_output=" + (.context_window.total_output_tokens // 0 | tostring | @sh),
   "vim_mode=" + (.vim.mode // "" | @sh),
   "duration_ms=" + (.cost.total_duration_ms // 0 | tostring | @sh),
   "lines_added=" + (.cost.total_lines_added // 0 | tostring | @sh),
@@ -84,7 +94,7 @@ if [ -n "$effort" ]; then
     low)    effort_label="Low";    effort_color="32" ;;
     medium) effort_label="Medium"; effort_color="33" ;;
     high)   effort_label="High";   effort_color="35" ;;
-    *)      effort_label="$(echo "$effort" | sed 's/./\u&/')"
+    *)      effort_label=$(printf '%s' "$effort" | awk '{ print toupper(substr($0, 1, 1)) substr($0, 2) }')
             effort_color="37" ;;
   esac
   part_effort=$(printf "\033[%sm✦ %s\033[0m" "$effort_color" "$effort_label")

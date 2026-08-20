@@ -2,371 +2,48 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
-# shellcheck source=bin/lib/common.sh
-. "$SCRIPT_DIR/lib/common.sh"
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
+host=${1:-}
+case $host in
+  personal | work) ;;
+  *) printf 'error: Usage: bin/switch <personal|work>\n' >&2; exit 1 ;;
+esac
 
-apply=false
-allow_no_snapshot=false
-legacy_repo=$HOME/dotfiles
-configuration=shared-macos
-etc_root=${DOTFILES_ETC_ROOT:-/etc}
-
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --apply)
-      apply=true
-      ;;
-    --allow-no-system-snapshot)
-      allow_no_snapshot=true
-      ;;
-    --legacy-repo)
-      [[ $# -ge 2 ]] || die "--legacy-repo requires a path."
-      legacy_repo=$2
-      shift
-      ;;
-    --configuration)
-      [[ $# -ge 2 ]] || die "--configuration requires a name."
-      configuration=$2
-      shift
-      ;;
-    *)
-      die "Usage: bin/switch [--apply] [--allow-no-system-snapshot] [--legacy-repo PATH] [--configuration NAME]"
-      ;;
-  esac
-  shift
-done
-
-require_apple_silicon_macos
-
-template_for() {
-  case $1 in
-    .claude/settings.json) printf '%s\n' "$DOTFILES_ROOT/templates/agents/claude-settings.json" ;;
-    .codex/config.toml) printf '%s\n' "$DOTFILES_ROOT/templates/agents/codex-config.toml" ;;
-    .pi/agent/settings.json) printf '%s\n' "$DOTFILES_ROOT/templates/agents/pi-settings.json" ;;
-    *) return 1 ;;
-  esac
+[[ $(uname -s) == "Darwin" && $(uname -m) == "arm64" ]] || {
+  printf 'error: This repository currently supports Apple Silicon macOS only.\n' >&2
+  exit 1
+}
+[[ -z $(git -C "$root" status --porcelain --untracked-files=normal) ]] || {
+  printf 'error: Refusing to activate a dirty checkout.\n' >&2
+  exit 1
 }
 
-verify_target() {
-  local mode=$1
-  local relative=$2
-  local source=$3
-  local target=$HOME/$relative
-  local expected=$legacy_repo/$source
-  local actual_resolved
-  local expected_resolved
-
-  if [[ -L $target ]]; then
-    if [[ $mode == "managed" ]] && is_nix_owned_path "$target"; then
-      printf 'keep    %-8s %s\n' "$mode" "$target"
-      return
-    fi
-    actual_resolved=$(canonical_existing_path "$target" 2>/dev/null) || die "$target is a dangling symlink."
-    expected_resolved=$(canonical_existing_path "$expected" 2>/dev/null) || die "Expected legacy source does not exist: $expected"
-    [[ $actual_resolved == "$expected_resolved" ]] || die "$target does not point into the expected legacy checkout."
-    printf 'migrate %-8s %s\n' "$mode" "$target"
-  elif [[ -e $target ]]; then
-    actual_resolved=$(canonical_existing_path "$target" 2>/dev/null || printf missing)
-    expected_resolved=$(canonical_existing_path "$expected" 2>/dev/null || printf missing)
-    if [[ $actual_resolved == "$expected_resolved" ]] && nearest_symlink_ancestor "$target" >/dev/null; then
-      printf 'unfold %-8s %s\n' "$mode" "$(nearest_symlink_ancestor "$target")"
-    elif [[ $mode == "managed" ]] && ! is_nix_owned_path "$target"; then
-      die "$target is a regular unmanaged path. Move it aside before switching."
-    else
-      printf 'keep    %-8s %s\n' "$mode" "$target"
-    fi
-  else
-    printf 'ready   %-8s %s\n' "$mode" "$target"
-  fi
-}
-
-is_declared_legacy_managed_target() {
-  local candidate=$1
-  local mode
-  local relative
-  local source
-
-  while IFS=$'\t' read -r mode relative source; do
-    [[ -n ${mode:-} && $mode != \#* ]] || continue
-    if [[ $mode == "managed" && $relative == "$candidate" ]]; then
-      return 0
-    fi
-  done < "$DOTFILES_ROOT/migration/legacy-links.tsv"
-
-  return 1
-}
-
-is_declared_adoptable_target() {
-  local candidate=$1
-  local strategy
-  local relative
-
-  while IFS=$'\t' read -r strategy relative; do
-    [[ -n ${strategy:-} && $strategy != \#* ]] || continue
-    [[ $relative == "$candidate" ]] && return 0
-  done < "$DOTFILES_ROOT/migration/adoptable-targets.tsv"
-
-  return 1
-}
-
-verify_adoptable_target() {
-  local strategy=$1
-  local relative=$2
-  local target=$HOME/$relative
-  local ancestor
-
-  if [[ -L $target ]] && is_nix_owned_path "$target"; then
-    printf 'keep    %-8s %s\n' "adopted" "$target"
-    return
-  fi
-
-  ancestor=$(nearest_symlink_ancestor "$target" 2>/dev/null || true)
-  [[ -z $ancestor ]] || die "$target is beneath an unmanaged parent symlink: $ancestor"
-
-  case $strategy in
-    empty)
-      if [[ ! -e $target && ! -L $target ]]; then
-        printf 'ready   %-8s %s\n' "adopted" "$target"
-      elif [[ -f $target && ! -L $target && ! -s $target ]]; then
-        printf 'adopt   %-8s %s\n' "empty" "$target"
-      else
-        die "$target is not the declared empty regular file. Move it aside before switching."
-      fi
-      ;;
-    *)
-      die "Unknown adoption strategy '$strategy' for $relative"
-      ;;
-  esac
-}
-
-verify_home_manager_target() {
-  local relative=$1
-  local target=$HOME/$relative
-  local ancestor
-
-  if is_declared_legacy_managed_target "$relative" || is_declared_adoptable_target "$relative"; then
-    return
-  fi
-
-  if [[ -L $target ]] && is_nix_owned_path "$target"; then
-    return
-  fi
-
-  if [[ -e $target || -L $target ]]; then
-    die "$target already exists and is not owned by this migration. Move it aside before switching."
-  fi
-
-  ancestor=$(nearest_symlink_ancestor "$target" 2>/dev/null || true)
-  [[ -z $ancestor ]] || die "$target would be created through an unmanaged parent symlink: $ancestor"
-}
-
-verify_all_targets() {
-  local mode
-  local relative
-  local source
-
-  while IFS=$'\t' read -r mode relative source; do
-    [[ -n ${mode:-} && $mode != \#* ]] || continue
-    verify_target "$mode" "$relative" "$source"
-  done < "$DOTFILES_ROOT/migration/legacy-links.tsv"
-
-  while IFS=$'\t' read -r mode relative; do
-    [[ -n ${mode:-} && $mode != \#* ]] || continue
-    verify_adoptable_target "$mode" "$relative"
-  done < "$DOTFILES_ROOT/migration/adoptable-targets.tsv"
-
-  while IFS= read -r relative; do
-    [[ -n $relative && $relative != \#* ]] || continue
-    verify_home_manager_target "$relative"
-  done < "$DOTFILES_ROOT/migration/home-manager-targets.txt"
-}
-
-say "Preflight home-path migration:"
-verify_all_targets
-
-etc_conflicts=$(first_activation_etc_conflicts "$etc_root")
-
-say ""
-say "Activation target: $DOTFILES_ROOT#$configuration"
-say "Homebrew cleanup: disabled"
-say "Legacy tool cleanup: deferred"
-if [[ -n $etc_conflicts ]]; then
-  say "First activation /etc conflicts:"
-  while IFS= read -r path; do
-    [[ -n $path ]] && say "  $path"
-  done <<< "$etc_conflicts"
-else
-  say "First activation /etc preflight: ready"
+if ! command -v nix >/dev/null 2>&1 && [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  set +u
+  # shellcheck disable=SC1091
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  set -u
 fi
-if homebrew_taproom_is_trusted; then
-  say "Taproom formula trust: present"
-else
-  say "Taproom formula trust: missing"
-fi
-
-if ! $apply; then
-  say ""
-  say "Dry run only. No files, packages, or system settings were changed."
-  say "Run bin/build first, then re-run with --apply when ready."
-  exit 0
-fi
-
-if [[ -n $etc_conflicts ]]; then
-  while IFS= read -r path; do
-    [[ -n $path ]] || continue
-    [[ ! -e $path.before-nix-darwin && ! -L $path.before-nix-darwin ]] || \
-      die "Both $path and $path.before-nix-darwin exist. Resolve them manually before activation."
-    warn "Preserve before first activation: sudo mv $path $path.before-nix-darwin"
-  done <<< "$etc_conflicts"
-  die "First activation would overwrite existing system shell files. Preserve them with the commands above, then retry."
-fi
-
-managed_branch_is_clean || die "Refusing to activate a dirty checkout. Commit the reviewed migration first."
-[[ -f $DOTFILES_ROOT/flake.lock ]] || die "flake.lock is missing. Generate and review it before activation."
-[[ -x $DOTFILES_ROOT/bin/build ]] || die "bin/build is not executable."
-command -v brew >/dev/null 2>&1 || die "Homebrew is required because this configuration declares casks and macOS exceptions."
-homebrew_taproom_is_trusted || die "Review Taproom, then trust only gromgit/brewtils/taproom before activation."
-
-load_nix_environment
-require_command nix
-
-"$DOTFILES_ROOT/bin/build"
-
-if command -v tmutil >/dev/null 2>&1; then
-  if tmutil localsnapshot >/dev/null 2>&1; then
-    say "Created a local Time Machine snapshot."
-  elif ! $allow_no_snapshot; then
-    die "Could not create a local Time Machine snapshot. Use --allow-no-system-snapshot only after arranging another recovery method."
-  else
-    warn "Continuing without a local Time Machine snapshot."
-  fi
-elif ! $allow_no_snapshot; then
-  die "tmutil is unavailable. Use --allow-no-system-snapshot only after arranging another recovery method."
-fi
-
-say "Revalidating home paths immediately before migration..."
-verify_all_targets
-
-backup_id=$(timestamp_utc)
-backup_dir=$DOTFILES_STATE_ROOT/backups/$backup_id
-mkdir -p "$backup_dir/files"
-: > "$backup_dir/links.tsv"
-: > "$backup_dir/folded.tsv"
-
-activation_finished=false
-
-restore_managed_after_failure() {
-  local relative
-  local target
-
-  $activation_finished && return
-  [[ -f $backup_dir/links.tsv ]] || return
-
-  warn "Activation failed. Restoring the exact pre-activation home topology from the backup."
-  while IFS= read -r relative; do
-    [[ -n $relative && $relative != \#* ]] || continue
-    target=$HOME/$relative
-    if [[ -L $target ]] && is_nix_owned_path "$target"; then
-      unlink "$target"
-    fi
-  done < "$DOTFILES_ROOT/migration/home-manager-targets.txt"
-
-  if ! restore_legacy_topology "$backup_dir"; then
-    warn "Topology recovery was incomplete. Review the warnings and keep the migration backup."
-  fi
-}
-trap restore_managed_after_failure EXIT
-
-unfold_legacy_directory() {
-  local ancestor=$1
-  local ancestor_relative=${ancestor#"$HOME"/}
-  local resolved
-  local temporary=$ancestor.dotfiles-unfold.$$
-
-  [[ -L $ancestor ]] || return
-  resolved=$(canonical_existing_path "$ancestor") || die "Cannot resolve folded Stow directory: $ancestor"
-  mkdir -p "$temporary"
-  cp -pR "$resolved/." "$temporary"
-  printf '%s\t%s\t%s\n' "$ancestor_relative" "$(readlink "$ancestor")" "$temporary" >> "$backup_dir/folded.tsv"
-  unlink "$ancestor"
-  mv "$temporary" "$ancestor"
+command -v nix >/dev/null 2>&1 || {
+  printf 'error: Nix is not available.\n' >&2
+  exit 1
 }
 
-while IFS=$'\t' read -r strategy relative; do
-  [[ -n ${strategy:-} && $strategy != \#* ]] || continue
-  target=$HOME/$relative
+"$root/bin/check"
+system_path=$(nix --extra-experimental-features "nix-command flakes" \
+  build --no-link --print-out-paths "$root#darwinConfigurations.$host.system")
+rebuild=$system_path/sw/bin/darwin-rebuild
+[[ -x $rebuild ]] || {
+  printf 'error: The built system does not contain darwin-rebuild.\n' >&2
+  exit 1
+}
 
-  if [[ $strategy == "empty" && -f $target && ! -L $target && ! -s $target ]]; then
-    mkdir -p "$backup_dir/files/$(dirname "$relative")"
-    cp -p "$target" "$backup_dir/files/$relative"
-    printf '%s\t%s\t%s\n' "managed" "$relative" "adopted:empty" >> "$backup_dir/links.tsv"
-    unlink "$target"
-  fi
-done < "$DOTFILES_ROOT/migration/adoptable-targets.tsv"
-
-while IFS=$'\t' read -r mode relative source; do
-  [[ -n ${mode:-} && $mode != \#* ]] || continue
-  target=$HOME/$relative
-
-  if [[ -L $target ]] && [[ $mode == "managed" ]] && is_nix_owned_path "$target"; then
-    continue
-  elif [[ -L $target ]]; then
-    mkdir -p "$backup_dir/files/$(dirname "$relative")"
-    cp -pL "$target" "$backup_dir/files/$relative"
-    printf '%s\t%s\t%s\n' "$mode" "$relative" "$(readlink "$target")" >> "$backup_dir/links.tsv"
-
-    if [[ $mode == "managed" ]]; then
-      unlink "$target"
-    else
-      temporary=$target.dotfiles-migration.$$
-      cp -pL "$target" "$temporary"
-      unlink "$target"
-      mv "$temporary" "$target"
-      [[ $mode != "mutable" ]] || chmod 600 "$target"
-    fi
-  elif [[ -e $target ]]; then
-    actual_resolved=$(canonical_existing_path "$target" 2>/dev/null || printf missing)
-    expected_resolved=$(canonical_existing_path "$legacy_repo/$source" 2>/dev/null || printf missing)
-    ancestor=$(nearest_symlink_ancestor "$target" 2>/dev/null || true)
-    if [[ -n $ancestor && $actual_resolved == "$expected_resolved" ]]; then
-      mkdir -p "$backup_dir/files/$(dirname "$relative")"
-      cp -p "$target" "$backup_dir/files/$relative"
-      printf '%s\t%s\t%s\n' "$mode" "$relative" "folded:${ancestor#"$HOME"/}" >> "$backup_dir/links.tsv"
-      unfold_legacy_directory "$ancestor"
-      if [[ $mode == "managed" ]]; then
-        /bin/rm -f "$target"
-      elif [[ $mode == "mutable" ]]; then
-        chmod 600 "$target"
-      fi
-    fi
-  elif [[ ! -e $target && $mode == "mutable" ]]; then
-    template=$(template_for "$relative") || die "No template is defined for $relative"
-    mkdir -p "$(dirname "$target")"
-    install -m 600 "$template" "$target"
-  fi
-done < "$DOTFILES_ROOT/migration/legacy-links.tsv"
-
-nix_bin=$(command -v nix)
-if command -v darwin-rebuild >/dev/null 2>&1; then
-  rebuild_bin=$(command -v darwin-rebuild)
-  sudo -H "$rebuild_bin" switch --flake "$DOTFILES_ROOT#$configuration"
-else
-  sudo -H "$nix_bin" \
-    --extra-experimental-features "nix-command flakes" \
-    run github:nix-darwin/nix-darwin/nix-darwin-26.05#darwin-rebuild -- \
-    switch --flake "$DOTFILES_ROOT#$configuration"
+if ! tmutil localsnapshot >/dev/null 2>&1; then
+  printf 'error: Could not create a local Time Machine snapshot.\n' >&2
+  exit 1
 fi
+printf '%s\n' "Created a local Time Machine snapshot."
 
-mkdir -p "$DOTFILES_STATE_ROOT/current"
-git -C "$DOTFILES_ROOT" rev-parse HEAD > "$DOTFILES_STATE_ROOT/current/revision"
-printf '%s\n' "$backup_dir" > "$DOTFILES_STATE_ROOT/current/backup"
-epoch_now > "$DOTFILES_STATE_ROOT/current/activated-at"
-printf '%s\n' "$configuration" > "$DOTFILES_STATE_ROOT/current/configuration"
+sudo -H "$rebuild" switch --flake "$root#$host"
 
-activation_finished=true
-trap - EXIT
-
-say "Activation completed successfully."
-say "Legacy Homebrew and Mise tools were deliberately left installed."
-say "Keep this generation for at least 30 days before running bin/cleanup-legacy --apply."
+printf 'Activated the %s configuration. Open a new terminal before verification.\n' "$host"

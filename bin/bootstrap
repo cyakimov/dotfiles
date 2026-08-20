@@ -2,36 +2,40 @@
 
 set -euo pipefail
 
-SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
-# shellcheck source=bin/lib/common.sh
-. "$SCRIPT_DIR/lib/common.sh"
-
 apply=false
 case ${1:-} in
   "") ;;
   --apply) apply=true ;;
-  *) die "Usage: bin/bootstrap [--apply]" ;;
+  *) printf 'error: Usage: bin/bootstrap [--apply]\n' >&2; exit 1 ;;
 esac
 
-require_apple_silicon_macos
+[[ $(uname -s) == "Darwin" && $(uname -m) == "arm64" ]] || {
+  printf 'error: This repository currently supports Apple Silicon macOS only.\n' >&2
+  exit 1
+}
 
-say "Bootstrap scope:"
-say "  - Install Homebrew from brew.sh if it is absent."
-say "  - Install multi-user Nix from nixos.org if it is absent."
-say "  - Do not activate nix-darwin."
-say "  - Do not unlink files or uninstall legacy tools."
+printf '%s\n' "Bootstrap installs Homebrew and multi-user Nix when they are missing."
+printf '%s\n' "It does not activate a system configuration."
 
 if ! $apply; then
-  say ""
-  say "Dry run only. Re-run with --apply to install missing prerequisites."
+  printf '%s\n' "Dry run only. Re-run with --apply to install missing prerequisites."
   exit 0
 fi
 
 free_kib=$(df -Pk / | awk 'NR == 2 { print $4 }')
-[[ $free_kib =~ ^[0-9]+$ ]] || die "Could not determine available disk space."
-(( free_kib >= 20971520 )) || die "At least 20 GiB of free disk space is required."
+[[ $free_kib =~ ^[0-9]+$ ]] || {
+  printf 'error: Could not determine available disk space.\n' >&2
+  exit 1
+}
+(( free_kib >= 20971520 )) || {
+  printf 'error: At least 20 GiB of free disk space is required.\n' >&2
+  exit 1
+}
 
-require_command curl
+command -v curl >/dev/null 2>&1 || {
+  printf 'error: curl is required.\n' >&2
+  exit 1
+}
 
 temp_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-bootstrap.XXXXXX")
 cleanup_temp() {
@@ -41,24 +45,24 @@ cleanup_temp() {
 trap cleanup_temp EXIT
 
 if command -v brew >/dev/null 2>&1; then
-  say "Homebrew is already installed: $(command -v brew)"
+  printf 'Homebrew is already installed: %s\n' "$(command -v brew)"
 else
-  say "Downloading the official Homebrew installer for interactive review..."
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$temp_dir/homebrew-install.sh"
   /bin/bash "$temp_dir/homebrew-install.sh"
 fi
 
-load_nix_environment
+if ! command -v nix >/dev/null 2>&1 && [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  set +u
+  # shellcheck disable=SC1091
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  set -u
+fi
+
 if command -v nix >/dev/null 2>&1; then
-  say "Nix is already installed: $(command -v nix)"
+  printf 'Nix is already installed: %s\n' "$(command -v nix)"
 else
-  say "Downloading the official multi-user Nix installer..."
   curl -fsSL https://nixos.org/nix/install -o "$temp_dir/nix-install.sh"
   /bin/sh "$temp_dir/nix-install.sh" --daemon
 fi
 
-say ""
-say "Prerequisite installation completed."
-say "Review and explicitly trust the third-party Taproom formula as documented in docs/migration.md."
-say "Open a new shell, generate and review flake.lock if needed, then run bin/build."
-say "No system generation was activated."
+printf '%s\n' "Bootstrap completed. Open a new shell, then run bin/check."

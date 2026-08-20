@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   self,
   ...
@@ -7,6 +8,11 @@
   imports = [ ./homebrew.nix ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
+  nixpkgs.config.allowUnfreePredicate =
+    package:
+    builtins.elem (lib.getName package) [
+      "claude-code"
+    ];
 
   nix = {
     enable = true;

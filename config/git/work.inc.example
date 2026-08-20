@@ -1,5 +1,5 @@
 # Copy this file to ~/.config/git/work.inc on a work machine.
-# Keep employer identity, signing keys, and internal paths out of this public repository.
+# Keep employer identity, signing keys, and internal paths out of this repository.
 
 [user]
   name = Your Name

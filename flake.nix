@@ -36,22 +36,29 @@
     let
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
+      mkDarwinConfiguration =
+        hostModule:
+        nix-darwin.lib.darwinSystem {
+          specialArgs = { inherit inputs self; };
+          modules = [
+            ./nix/darwin.nix
+            hostModule
+            home-manager.darwinModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = { inherit inputs self; };
+                users.cyakimov = import ./nix/home.nix;
+              };
+            }
+          ];
+        };
     in
     {
-      darwinConfigurations.shared-macos = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs self; };
-        modules = [
-          ./nix/darwin.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self; };
-              users.cyakimov = import ./nix/home.nix;
-            };
-          }
-        ];
+      darwinConfigurations = {
+        personal = mkDarwinConfiguration ./hosts/personal.nix;
+        work = mkDarwinConfiguration ./hosts/work.nix;
       };
 
       formatter.${system} = pkgs.nixfmt;
@@ -61,23 +68,33 @@
       };
 
       checks.${system} = {
-        darwin = self.darwinConfigurations.shared-macos.system;
+        personal = self.darwinConfigurations.personal.system;
+        work = self.darwinConfigurations.work.system;
         static =
           pkgs.runCommand "dotfiles-static-checks"
             {
               nativeBuildInputs = with pkgs; [
                 bash
+                deadnix
                 git
                 jq
+                nixfmt
                 python3
                 shellcheck
+                statix
               ];
             }
             ''
               cp -R ${self} source
               chmod -R u+w source
-              mkdir home
-              HOME=$PWD/home source/bin/verify
+              find source/bin -type f -print0 | xargs -0 -n1 bash -n
+              shellcheck source/bin/* source/config/agents/claude-statusline.sh
+              find source -type f -name '*.nix' -exec nixfmt --check {} +
+              deadnix --fail source
+              statix check source
+              find source/config -type f -name '*.json' -print0 | xargs -0 -n1 jq empty
+              find source/config -type f -name '*.toml' -print0 | \
+                xargs -0 -n1 python3 -c 'import pathlib, sys, tomllib; tomllib.loads(pathlib.Path(sys.argv[1]).read_text())'
               touch $out
             '';
       };

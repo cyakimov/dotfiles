@@ -21,9 +21,6 @@
       ];
       historyFileSize = 50000;
       historySize = 50000;
-      initExtra = ''
-        command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
-      '';
     };
 
     fzf = {
@@ -91,9 +88,6 @@
 
           [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
           [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
-
-          command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
-          command -v treepi >/dev/null 2>&1 && eval "$(treepi shell-init zsh)"
 
           bindkey $'\e[1;3D' backward-word
           bindkey $'\e[1;3C' forward-word
