@@ -69,6 +69,23 @@ The repository disables automatic Nix garbage collection and store optimization.
 Keep at least one known-good generation and the `/etc/*.before-nix-darwin` files.
 Do not empty the Trash containing pre-Nix legacy state until the new configuration has been stable long enough to be trusted.
 
+## Update Neovim plugins
+
+`~/.config/nvim` is a writable symlink to `config/nvim` in this repository, so lazy.nvim edits the checkout directly.
+
+```bash
+nvim  # then :Lazy update
+git diff -- config/nvim/lazy-lock.json
+git add config/nvim/lazy-lock.json
+git commit -m "chore: update Neovim plugins"
+```
+
+Committing is not optional housekeeping.
+`bin/switch` and `bin/update` both refuse a dirty checkout, so an uncommitted lockfile blocks the next activation.
+
+Enabling an extra with `:LazyExtras` rewrites `config/nvim/lazyvim.json`, which is committed the same way.
+The plugin payload under `~/.local/share/nvim`, along with `~/.local/state/nvim` and `~/.cache/nvim`, is regenerable runtime state and stays unmanaged.
+
 ## Secrets and mutable state
 
 Authentication, SSH keys, application databases, histories, caches, and employer configuration are not managed here.

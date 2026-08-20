@@ -8,6 +8,7 @@
   imports = [
     ./modules/agents.nix
     ./modules/git.nix
+    ./modules/neovim.nix
     ./modules/shell.nix
     ./modules/terminals.nix
     ./modules/tmux.nix
@@ -30,11 +31,11 @@
     ];
 
     sessionVariables = {
-      EDITOR = "nano";
+      EDITOR = "nvim";
       GOPATH = "/Users/cyakimov/go";
       LANG = "en_US.UTF-8";
       LC_ALL = "en_US.UTF-8";
-      VISUAL = "nano";
+      VISUAL = "nvim";
     };
   };
 
