@@ -25,8 +25,9 @@ Do not change the login shell during diagnosis.
 | Symptom | First action | Scope |
 | --- | --- | --- |
 | New configuration is wrong but `darwin-rebuild` works | `bin/rollback --system` | Preview previous system generation |
-| Activation failed after legacy links were moved | Let `bin/switch` finish its automatic file restore | Managed home files only |
+| Activation failed after legacy links were moved | Let `bin/switch` finish its automatic topology restore | Exact recorded home topology |
 | Shell startup is unusable | Run `/bin/zsh -f` | Current terminal only |
+| Automatic topology recovery was interrupted | `bin/rollback --legacy-links` | Preview exact legacy link restore |
 | Home Manager links must be bypassed urgently | `bin/rollback --legacy-files` | Preview regular-file restore |
 | A cleaned Mise tool is needed | Restore the retired config and payload from the state backup | User tools only |
 | A purged Mise payload is needed | Move it back from `~/.Trash` | User tools only |
@@ -53,7 +54,30 @@ It does not restore Stow and does not uninstall packages.
 
 After rollback, open a new terminal and run `bin/audit`.
 
-## Restore pre-migration files
+## Restore exact pre-activation topology
+
+Use this path if an activation failure or interruption leaves legacy Stow links unfolded or replaced.
+
+Preview the most recent backup:
+
+```bash
+bin/rollback --legacy-links
+```
+
+Apply:
+
+```bash
+bin/rollback --legacy-links --apply
+```
+
+The restore recreates the recorded direct file links and folded directory links.
+It replaces only paths that are absent, Nix-owned, or content-identical to their backups.
+It refuses to overwrite foreign or modified paths.
+When a content-identical unfolded directory must become a link again, the regular directory is moved under `backups/<timestamp>/recovered-folded/` instead of being deleted.
+
+Run `bin/audit --strict` after the restore.
+
+## Restore emergency regular files
 
 Use this emergency path when Home Manager-created files prevent a usable shell and a system rollback is unavailable or insufficient.
 
@@ -92,6 +116,8 @@ Important records include:
 - `current/cleaned-at`
 - `backups/<timestamp>/files/`
 - `backups/<timestamp>/links.tsv`
+- `backups/<timestamp>/folded.tsv`
+- `backups/<timestamp>/recovered-folded/`
 - `retired/<timestamp>/mise-config.toml`
 
 Do not remove this directory until both Macs have completed the migration and their proving periods.

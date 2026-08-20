@@ -99,6 +99,19 @@ It refuses dangling links, foreign links, and unmanaged regular files at Home Ma
 It explicitly adopts the existing empty `~/.zshenv`, preserving it in the migration backup before Home Manager replaces it.
 Any non-empty or linked `~/.zshenv` is refused.
 
+The preview also reports existing `/etc/bashrc` and `/etc/zshrc` paths unless they are already owned by Nix.
+The official multi-user Nix installer adds its daemon profile stanza to the stock macOS versions of these files.
+Inspect them for any additional customization before preserving them for nix-darwin:
+
+```bash
+sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
+sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
+```
+
+These commands retain the complete original files and match nix-darwin's expected backup names.
+The apply form refuses to build, snapshot, or change home paths while either conflict remains.
+It also refuses when both an original path and its `.before-nix-darwin` backup already exist.
+
 The existing `~/.config/git/ignore` is not managed or removed.
 Git continues to use the declarative `~/.gitignore_global`, which avoids overwriting unrelated XDG state.
 
@@ -128,15 +141,16 @@ bin/switch --apply --legacy-repo ~/dotfiles
 The script performs these actions in order:
 
 1. Revalidates every migration target.
-2. Refuses a dirty checkout or missing lock file.
-3. Builds the candidate without activation.
-4. Creates a local Time Machine snapshot.
-5. Copies legacy file contents into a timestamped state backup.
-6. Converts mutable settings from repository symlinks to local regular files.
-7. Removes only verified legacy links that Home Manager must replace.
-8. Activates the reviewed flake.
-9. Restores managed backup files automatically if activation fails.
-10. Records the revision, activation time, configuration name, and backup path.
+2. Refuses first-activation `/etc` conflicts before making any change.
+3. Refuses a dirty checkout or missing lock file.
+4. Builds the candidate without activation.
+5. Creates a local Time Machine snapshot.
+6. Copies legacy file contents and link metadata into a timestamped state backup.
+7. Converts mutable settings from repository symlinks to local regular files.
+8. Removes only verified legacy links that Home Manager must replace.
+9. Activates the reviewed flake.
+10. Restores the exact recorded direct and folded legacy link topology automatically if activation fails.
+11. Records the revision, activation time, configuration name, and backup path.
 
 The state directory is `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles-migration`.
 Do not delete it during the migration.

@@ -15,12 +15,13 @@ while [[ $# -gt 0 ]]; do
     --apply) apply=true ;;
     --system) mode=system ;;
     --legacy-files) mode=legacy ;;
+    --legacy-links) mode=links ;;
     --backup)
       [[ $# -ge 2 ]] || die "--backup requires a directory."
       backup_dir=$2
       shift
       ;;
-    *) die "Usage: bin/rollback [--apply] [--system | --legacy-files] [--backup DIR]" ;;
+    *) die "Usage: bin/rollback [--apply] [--system | --legacy-files | --legacy-links] [--backup DIR]" ;;
   esac
   shift
 done
@@ -44,6 +45,18 @@ if [[ -z $backup_dir ]]; then
   backup_dir=$(latest_backup_dir) || die "No migration backup was found."
 fi
 [[ -f $backup_dir/links.tsv ]] || die "Invalid migration backup: $backup_dir"
+
+if [[ $mode == "links" ]]; then
+  say "Exact legacy topology restore from: $backup_dir"
+  if ! $apply; then
+    say "Dry run only. Re-run with --legacy-links --apply to restore recorded file and folded-directory links."
+    exit 0
+  fi
+
+  restore_legacy_topology "$backup_dir" || die "Exact legacy topology recovery was incomplete."
+  say "The recorded pre-activation home topology was restored."
+  exit 0
+fi
 
 say "Emergency file restore from: $backup_dir"
 while IFS=$'\t' read -r entry_mode relative _; do

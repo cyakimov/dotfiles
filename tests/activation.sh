@@ -33,6 +33,24 @@ assert_contains "$output" "Dry run only"
 assert_contains "$output" "Homebrew cleanup: disabled"
 assert_contains "$output" "unfold managed"
 
+etc_root=$temp_dir/etc
+mkdir -p "$etc_root"
+printf 'system bash configuration\n' > "$etc_root/bashrc"
+
+if HOME="$test_home" DOTFILES_ETC_ROOT="$etc_root" \
+  "$TEST_ROOT/bin/switch" --apply --legacy-repo "$legacy_repo" > "$temp_dir/etc.out" 2>&1; then
+  fail "Switch accepted a first-activation /etc conflict."
+fi
+assert_contains "$(sed -n '1,240p' "$temp_dir/etc.out")" "sudo mv $etc_root/bashrc $etc_root/bashrc.before-nix-darwin"
+[[ -L $test_home/.zshrc ]] || fail "System preflight changed the test home."
+
+touch "$etc_root/bashrc.before-nix-darwin"
+if HOME="$test_home" DOTFILES_ETC_ROOT="$etc_root" \
+  "$TEST_ROOT/bin/switch" --apply --legacy-repo "$legacy_repo" > "$temp_dir/etc-backup.out" 2>&1; then
+  fail "Switch accepted simultaneous system shell file and backup paths."
+fi
+assert_contains "$(sed -n '1,240p' "$temp_dir/etc-backup.out")" "Both $etc_root/bashrc and $etc_root/bashrc.before-nix-darwin exist"
+
 foreign_target=$temp_dir/foreign
 printf 'foreign\n' > "$foreign_target"
 unlink "$test_home/.zshrc"

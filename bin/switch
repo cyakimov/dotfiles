@@ -10,6 +10,7 @@ apply=false
 allow_no_snapshot=false
 legacy_repo=$HOME/dotfiles
 configuration=shared-macos
+etc_root=${DOTFILES_ETC_ROOT:-/etc}
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -184,10 +185,20 @@ verify_all_targets() {
 say "Preflight home-path migration:"
 verify_all_targets
 
+etc_conflicts=$(first_activation_etc_conflicts "$etc_root")
+
 say ""
 say "Activation target: $DOTFILES_ROOT#$configuration"
 say "Homebrew cleanup: disabled"
 say "Legacy tool cleanup: deferred"
+if [[ -n $etc_conflicts ]]; then
+  say "First activation /etc conflicts:"
+  while IFS= read -r path; do
+    [[ -n $path ]] && say "  $path"
+  done <<< "$etc_conflicts"
+else
+  say "First activation /etc preflight: ready"
+fi
 if homebrew_taproom_is_trusted; then
   say "Taproom formula trust: present"
 else
@@ -199,6 +210,16 @@ if ! $apply; then
   say "Dry run only. No files, packages, or system settings were changed."
   say "Run bin/build first, then re-run with --apply when ready."
   exit 0
+fi
+
+if [[ -n $etc_conflicts ]]; then
+  while IFS= read -r path; do
+    [[ -n $path ]] || continue
+    [[ ! -e $path.before-nix-darwin && ! -L $path.before-nix-darwin ]] || \
+      die "Both $path and $path.before-nix-darwin exist. Resolve them manually before activation."
+    warn "Preserve before first activation: sudo mv $path $path.before-nix-darwin"
+  done <<< "$etc_conflicts"
+  die "First activation would overwrite existing system shell files. Preserve them with the commands above, then retry."
 fi
 
 managed_branch_is_clean || die "Refusing to activate a dirty checkout. Commit the reviewed migration first."
@@ -236,25 +257,13 @@ mkdir -p "$backup_dir/files"
 activation_finished=false
 
 restore_managed_after_failure() {
-  local ancestor
-  local ancestor_relative
-  local mode
   local relative
   local target
-  local temporary
 
   $activation_finished && return
   [[ -f $backup_dir/links.tsv ]] || return
 
-  warn "Activation failed. Restoring the managed shell and configuration paths from the backup."
-  while IFS=$'\t' read -r ancestor_relative _ temporary; do
-    [[ -n ${ancestor_relative:-} ]] || continue
-    ancestor=$HOME/$ancestor_relative
-    if [[ ! -e $ancestor && ! -L $ancestor && -d $temporary ]]; then
-      mv "$temporary" "$ancestor"
-    fi
-  done < "$backup_dir/folded.tsv"
-
+  warn "Activation failed. Restoring the exact pre-activation home topology from the backup."
   while IFS= read -r relative; do
     [[ -n $relative && $relative != \#* ]] || continue
     target=$HOME/$relative
@@ -263,16 +272,9 @@ restore_managed_after_failure() {
     fi
   done < "$DOTFILES_ROOT/migration/home-manager-targets.txt"
 
-  while IFS=$'\t' read -r mode relative _; do
-    [[ $mode == "managed" ]] || continue
-    target=$HOME/$relative
-    if [[ -e $target || -L $target ]]; then
-      warn "Left unexpected path untouched during recovery: $target"
-      continue
-    fi
-    mkdir -p "$(dirname "$target")"
-    cp -p "$backup_dir/files/$relative" "$target"
-  done < "$backup_dir/links.tsv"
+  if ! restore_legacy_topology "$backup_dir"; then
+    warn "Topology recovery was incomplete. Review the warnings and keep the migration backup."
+  fi
 }
 trap restore_managed_after_failure EXIT
 
