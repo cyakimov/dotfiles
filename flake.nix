@@ -54,31 +54,38 @@
         ];
       };
 
-      formatter.${system} = pkgs.nixfmt-rfc-style;
+      formatter.${system} = pkgs.nixfmt;
+
+      packages.${system}.openspec = pkgs.callPackage ./nix/packages/openspec.nix {
+        src = inputs.openspec;
+      };
 
       checks.${system} = {
         darwin = self.darwinConfigurations.shared-macos.system;
-        static = pkgs.runCommand "dotfiles-static-checks" {
-          nativeBuildInputs = with pkgs; [
-            bash
-            git
-            jq
-            python3
-            shellcheck
-          ];
-        } ''
-          cp -R ${self} source
-          chmod -R u+w source
-          mkdir home
-          HOME=$PWD/home source/bin/verify
-          touch $out
-        '';
+        static =
+          pkgs.runCommand "dotfiles-static-checks"
+            {
+              nativeBuildInputs = with pkgs; [
+                bash
+                git
+                jq
+                python3
+                shellcheck
+              ];
+            }
+            ''
+              cp -R ${self} source
+              chmod -R u+w source
+              mkdir home
+              HOME=$PWD/home source/bin/verify
+              touch $out
+            '';
       };
 
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
           deadnix
-          nixfmt-rfc-style
+          nixfmt
           shellcheck
           statix
         ];

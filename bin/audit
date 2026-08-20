@@ -37,6 +37,7 @@ check "Worktree clean" "$(managed_branch_is_clean && printf yes || printf no)"
 
 say ""
 say "Managers"
+load_nix_environment
 for manager in nix darwin-rebuild home-manager brew stow mise; do
   if command -v "$manager" >/dev/null 2>&1; then
     check "$manager" "$(command -v "$manager")"

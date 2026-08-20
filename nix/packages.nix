@@ -33,7 +33,12 @@ with pkgs;
   neovim
   nodejs_latest
   overmind
-  pre-commit
+  # Nixpkgs' install tests pull unrelated language toolchains that are not runtime dependencies.
+  (pre-commit.overridePythonAttrs (_: {
+    doCheck = false;
+    dontUsePytestCheck = true;
+    preCheck = "";
+  }))
   protobuf
   protoc-gen-connect-go
   protoc-gen-go
@@ -50,6 +55,6 @@ with pkgs;
   trivy
   uv
   watch
-  inputs.openspec.packages.${pkgs.system}.default
-  inputs.pi.packages.${pkgs.system}.coding-agent
+  (pkgs.callPackage ./packages/openspec.nix { src = inputs.openspec; })
+  inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
 ]

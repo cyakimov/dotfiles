@@ -72,6 +72,7 @@ Adding Linux, Intel macOS, or a different user should be a separate reviewed cha
 │   ├── home.nix
 │   ├── homebrew.nix
 │   ├── packages.nix
+│   ├── packages/
 │   └── modules/
 ├── templates/
 │   ├── agents/

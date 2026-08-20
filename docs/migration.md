@@ -80,7 +80,9 @@ bin/build
 The build must complete before any home link is touched.
 Do not work around evaluation failures by deleting packages from the migration ledger without documenting the ownership change.
 
-OpenSpec comes from its official upstream flake.
+OpenSpec source comes from its official upstream flake.
+Its local package expression uses the security-supported pnpm from the pinned Nixpkgs because OpenSpec 1.10.0's upstream flake still hardcodes an insecure pnpm 9 release.
+Remove the local expression once upstream moves to a supported pnpm release.
 Pi currently comes from the pinned `lukasl-dev/pi.nix` packaging flake because the Pi project does not publish an official Nix flake.
 Treat replacement of that community input with an official upstream package as future maintenance work.
 

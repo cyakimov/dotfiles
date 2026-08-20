@@ -14,4 +14,8 @@ output=$(HOME="$temp_dir/home" "$TEST_ROOT/bin/audit")
 assert_contains "$output" "Legacy and managed home paths"
 assert_contains "$output" "Replacement command providers"
 
+if [[ -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+  assert_contains "$output" "/nix/var/nix/profiles/default/bin/nix"
+fi
+
 printf 'PASS: audit is read-only against an empty home\n'

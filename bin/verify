@@ -43,6 +43,7 @@ say "Running migration safety tests..."
 "$DOTFILES_ROOT/tests/manifests.sh"
 "$DOTFILES_ROOT/tests/recovery.sh"
 
+load_nix_environment
 if command -v nix-instantiate >/dev/null 2>&1; then
   say "Parsing Nix expressions..."
   while IFS= read -r nix_file; do
