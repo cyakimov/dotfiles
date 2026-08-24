@@ -117,8 +117,7 @@ hash_mutable_settings() {
   : >"$output"
   for relative in \
     .claude/settings.json \
-    .codex/config.toml \
-    .pi/agent/settings.json; do
+    .codex/config.toml; do
     path=$HOME/$relative
     if [[ -f $path ]]; then
       hash=$(shasum -a 256 "$path" | awk '{ print $1 }')
@@ -229,8 +228,7 @@ audit() {
     "$HOME/.tmux.conf" \
     "$HOME/.config" \
     "$HOME/.claude" \
-    "$HOME/.codex" \
-    "$HOME/.pi"; do
+    "$HOME/.codex"; do
     if [[ -e $path || -L $path ]]; then
       ls -ld "$path" >>"$state_root/managed-home-paths.txt"
     fi
@@ -355,7 +353,7 @@ preserve_home_paths() {
   local relative
 
   touch "$state_root/moved-home.tsv"
-  for relative in .config .claude .codex .pi .docker; do
+  for relative in .config .claude .codex .docker; do
     unfold_parent "$HOME/$relative"
   done
 
@@ -379,8 +377,6 @@ preserve_home_paths() {
     .claude/CLAUDE.md \
     .claude/statusline-command.sh \
     .codex/AGENTS.md \
-    .pi/agent/AGENTS.md \
-    .pi/agent/keybindings.json \
     .docker/cli-plugins/docker-compose; do
     move_home_path "$HOME/$relative"
   done
