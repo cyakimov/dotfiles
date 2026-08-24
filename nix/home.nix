@@ -22,6 +22,7 @@
       "/etc/profiles/per-user/cyakimov/bin"
       "/run/current-system/sw/bin"
       "$HOME/bin"
+      "$HOME/.local/bin"
       "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
       "/opt/homebrew/bin"
       "/opt/homebrew/sbin"
