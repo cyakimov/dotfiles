@@ -25,16 +25,16 @@ in
       message = "Pi configuration is not permitted in the work profile.";
     }
     {
+      assertion = !workHome.programs.git.enable;
+      message = "The work profile must not manage Git configuration.";
+    }
+    {
+      assertion = !(workHome.xdg.configFile ? "git/config");
+      message = "Nix must not write the work Git configuration.";
+    }
+    {
       assertion = !(workHome.xdg.configFile ? "git/personal.inc");
       message = "Personal Git identity is not permitted in the work profile.";
     }
-    {
-      assertion = workHome.programs.git.includes == [ ];
-      message = "The work profile must not include any Git identity file.";
-    }
-  ];
-
-  homebrew.casks = [
-    "gcloud-cli"
   ];
 }

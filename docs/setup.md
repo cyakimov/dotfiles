@@ -33,22 +33,13 @@ bin/check personal
 Use `bin/check work` on a work Mac.
 Running `bin/check` without an argument performs static validation and builds both systems.
 
-## 4. Configure work identity
+## 4. Git configuration
 
-Skip this step on a personal-only machine.
-The personal profile installs its own identity, so nothing is needed there.
+Nothing to do on either machine.
 
-Home Manager owns `~/.config/git/config` as a read-only store symlink and deliberately writes no identity into it.
-Create `~/.gitconfig` first, otherwise `git config --global` targets the read-only file and fails.
-
-```bash
-touch ~/.gitconfig
-git config --global user.name "Your Name"
-git config --global user.email you@company.example
-```
-
-Git reads `~/.gitconfig` after `~/.config/git/config`, so these values win.
-This repository never creates, reads, or validates that file.
+The personal profile installs its own identity and Git behavior automatically.
+The work profile writes no Git configuration, because that machine's Git configuration is managed by MDM.
+This repository never creates, reads, or validates it.
 
 ## 5. Activate one profile
 
@@ -71,5 +62,5 @@ command -v nix gh go node rustc
 ```
 
 Confirm that the expected terminal applications launch.
-Check the resolved Git identity with `git config --show-origin --get user.email`.
-On the personal profile it comes from `~/.config/git/personal.inc`, and on a work machine from `~/.gitconfig`.
+On the personal profile, check the resolved Git identity with `git config --show-origin --get user.email`.
+It must come from `~/.config/git/personal.inc`.

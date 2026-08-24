@@ -6,6 +6,8 @@
 }:
 {
   home-manager.users.cyakimov = {
+    imports = [ ../nix/modules/git.nix ];
+
     home = {
       packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr

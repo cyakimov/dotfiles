@@ -21,6 +21,7 @@ with pkgs;
   fastfetch
   fd
   gh
+  git-lfs
   go_1_26
   go-tools
   golangci-lint

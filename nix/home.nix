@@ -6,7 +6,6 @@
 {
   imports = [
     ./modules/agents.nix
-    ./modules/git.nix
     ./modules/neovim.nix
     ./modules/shell.nix
     ./modules/terminals.nix

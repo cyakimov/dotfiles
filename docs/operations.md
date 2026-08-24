@@ -5,13 +5,13 @@
 Both profiles install Bruno, Codex, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, OpenLogi, UnnaturalScrollWheels, and WezTerm through Homebrew.
 
 The personal profile additionally installs Herdr, the Pi coding agent, and OpenSpec from their release flakes.
-Pi is not available in the work profile, where Claude Code and Codex are the permitted agents.
 It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
 
-The work profile additionally installs only Google Cloud CLI.
+The work profile declares no additional applications.
+Pi, Herdr, and OpenSpec are not available there, where Claude Code and Codex are the permitted agents.
 Slack is not declared in either profile.
 
-The shared Homebrew formula exceptions are mactop, Mole, and the explicitly trusted Taproom formula.
+The shared Homebrew formula exceptions are mactop and Mole.
 All other command-line tools belong in `nix/packages.nix`.
 
 ## Update dependencies
@@ -92,6 +92,7 @@ The plugin payload under `~/.local/share/nvim`, along with `~/.local/state/nvim`
 Authentication, SSH keys, application databases, histories, caches, and employer configuration are not managed here.
 Home Manager manages only the stable files explicitly declared under `nix/modules/`.
 
-Git identity follows that rule.
-The shared module declares Git behavior only, `hosts/personal.nix` adds the personal identity, and the work identity is left entirely to `~/.gitconfig`.
-Because `~/.config/git/config` is a read-only store symlink, `git config --global` fails unless `~/.gitconfig` already exists.
+Git follows that rule.
+`hosts/personal.nix` imports `nix/modules/git.nix`, so Git behavior and the personal identity exist only on that profile.
+The work profile writes nothing Git-config-shaped, leaving the MDM-managed `~/.config/git/config` untouched.
+Work keeps the `git-lfs` binary from `nix/packages.nix`, but registers no LFS filters; run `git lfs install` locally if a repository needs them.

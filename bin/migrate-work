@@ -368,9 +368,6 @@ preserve_home_paths() {
     .p10k.zsh \
     .zsh_aliases \
     .tmux.conf \
-    .gitconfig \
-    .gitignore_global \
-    .config/git/personal.inc \
     .config/ghostty/config \
     .config/herdr \
     .config/wezterm \
@@ -468,8 +465,7 @@ activate() {
   "$root/bin/switch" work
 
   touch "$state_root/activated"
-  note "This repository does not manage the work Git identity."
-  note "Set it before committing: touch ~/.gitconfig then git config --global user.name and user.email."
+  note "Git configuration on this machine is managed by MDM and is not touched here."
   note "Activation completed. Open a new terminal and run bin/migrate-work verify."
 }
 
@@ -525,8 +521,8 @@ verify() {
   /bin/zsh -lic '(( ! $+commands[mise] && ! $+commands[herdr] && ! $+functions[_mise_hook] ))' || \
     die "A fresh Zsh login still exposes Mise or Herdr."
 
-  ! git config --file "$HOME/.config/git/config" --get user.email >/dev/null 2>&1 || \
-    die "The Nix-managed Git configuration must not define an identity."
+  [[ ! -L $HOME/.config/git/config ]] || \
+    die "Nix must not manage the work Git configuration."
   verify_mutable_settings
 
   generate_brewfile
