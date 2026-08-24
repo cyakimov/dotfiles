@@ -44,7 +44,6 @@
     "opensuperwhisper"
     "spotify"
     "transmission"
-    "visual-studio-code"
     "vlc"
     "zoom"
   ];

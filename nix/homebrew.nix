@@ -21,6 +21,7 @@ _: {
       "ghostty"
       "openlogi"
       "unnaturalscrollwheels"
+      "visual-studio-code"
       "wezterm"
     ];
   };
