@@ -4,14 +4,6 @@
     enable = true;
     lfs.enable = true;
 
-    includes = [
-      { path = "~/.config/git/personal.inc"; }
-      {
-        condition = "gitdir:~/Development/Work/";
-        path = "~/.config/git/work.inc";
-      }
-    ];
-
     settings = {
       color.ui = "auto";
       core = {
@@ -35,8 +27,4 @@
   };
 
   home.file.".gitignore_global".source = "${self}/config/git/ignore_global";
-
-  xdg.configFile."git/personal.inc" = {
-    source = "${self}/config/git/personal.inc";
-  };
 }

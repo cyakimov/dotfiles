@@ -36,14 +36,19 @@ Running `bin/check` without an argument performs static validation and builds bo
 ## 4. Configure work identity
 
 Skip this step on a personal-only machine.
+The personal profile installs its own identity, so nothing is needed there.
+
+Home Manager owns `~/.config/git/config` as a read-only store symlink and deliberately writes no identity into it.
+Create `~/.gitconfig` first, otherwise `git config --global` targets the read-only file and fails.
 
 ```bash
-mkdir -p ~/.config/git
-cp config/git/work.inc.example ~/.config/git/work.inc
+touch ~/.gitconfig
+git config --global user.name "Your Name"
+git config --global user.email you@company.example
 ```
 
-Edit the copied file with the employer identity and signing key.
-The local file is intentionally not managed by Home Manager.
+Git reads `~/.gitconfig` after `~/.config/git/config`, so these values win.
+This repository never creates, reads, or validates that file.
 
 ## 5. Activate one profile
 
@@ -65,4 +70,6 @@ git config --show-origin --get user.email
 command -v nix gh go node rustc
 ```
 
-Confirm that the expected terminal applications launch and that Git uses the correct identity inside personal and work repositories.
+Confirm that the expected terminal applications launch.
+Check the resolved Git identity with `git config --show-origin --get user.email`.
+On the personal profile it comes from `~/.config/git/personal.inc`, and on a work machine from `~/.gitconfig`.

@@ -90,3 +90,7 @@ The plugin payload under `~/.local/share/nvim`, along with `~/.local/state/nvim`
 
 Authentication, SSH keys, application databases, histories, caches, and employer configuration are not managed here.
 Home Manager manages only the stable files explicitly declared under `nix/modules/`.
+
+Git identity follows that rule.
+The shared module declares Git behavior only, `hosts/personal.nix` adds the personal identity, and the work identity is left entirely to `~/.gitconfig`.
+Because `~/.config/git/config` is a read-only store symlink, `git config --global` fails unless `~/.gitconfig` already exists.

@@ -12,6 +12,14 @@ in
       assertion = !(workHome.xdg.configFile ? "herdr/config.toml");
       message = "Herdr configuration is not permitted in the work profile.";
     }
+    {
+      assertion = !(workHome.xdg.configFile ? "git/personal.inc");
+      message = "Personal Git identity is not permitted in the work profile.";
+    }
+    {
+      assertion = workHome.programs.git.includes == [ ];
+      message = "The work profile must not include any Git identity file.";
+    }
   ];
 
   homebrew.casks = [

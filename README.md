@@ -16,7 +16,8 @@ Homebrew owns GUI applications, fonts, and some exceptions.
 Homebrew removes packages that are not declared by the selected profile during activation.
 
 Credentials, work identity, mutable application state, and secrets stay outside Git.
-Copy `config/git/work.inc.example` to `~/.config/git/work.inc` on a work machine and fill it in locally.
+Nix manages Git behavior on both profiles, personal Git identity only on `personal`, and work Git identity not at all.
+On a work machine the identity lives in `~/.gitconfig`, which this repository never creates, reads, or validates.
 
 `config/nvim` is the one directory linked into place as a writable symlink rather than a read-only store copy.
 lazy.nvim needs to write `lazy-lock.json` there, so plugin updates land as ordinary changes in this checkout and must be committed before `bin/switch` will run.
@@ -28,7 +29,7 @@ lazy.nvim needs to write `lazy-lock.json` there, so plugin updates land as ordin
 ├── bin/                 # Setup, validation, activation, and update commands
 ├── config/
 │   ├── agents/          # Shared instructions and agent UI configuration
-│   ├── git/             # Personal identity, work template, and global ignores
+│   ├── git/             # Personal identity and global ignores
 │   ├── herdr/           # Herdr terminal workspace manager
 │   ├── pi/              # Pi coding agent keybindings
 │   ├── nvim/            # Neovim configuration built on LazyVim

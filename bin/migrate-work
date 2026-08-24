@@ -261,32 +261,6 @@ audit() {
   note "Audit completed. Run bin/migrate-work prepare."
 }
 
-validate_work_identity() {
-  local identity=$HOME/.config/git/work.inc
-  local name email signing_key
-
-  [[ -f $identity && ! -L $identity ]] || die "Work identity must be a regular file: $identity"
-  name=$(git config --file "$identity" --get user.name || true)
-  email=$(git config --file "$identity" --get user.email || true)
-  signing_key=$(git config --file "$identity" --get user.signingkey || true)
-  [[ -n $name && $name != "Your Name" ]] || die "Set the work user.name in $identity"
-  [[ -n $email && $email != *company.example* ]] || die "Set the work user.email in $identity"
-  [[ -n $signing_key && $signing_key != *REPLACE_ME* ]] || die "Set the work SSH signing key in $identity"
-  chmod 600 "$identity"
-}
-
-prepare_work_identity() {
-  local identity=$HOME/.config/git/work.inc
-  if [[ ! -e $identity ]]; then
-    mkdir -p "$HOME/.config/git"
-    cp "$root/config/git/work.inc.example" "$identity"
-    chmod 600 "$identity"
-    note "Created $identity"
-    die "Fill in the work identity and rerun prepare."
-  fi
-  validate_work_identity
-}
-
 generate_brewfile() {
   nix --extra-experimental-features "nix-command flakes" \
     eval --raw --no-write-lock-file \
@@ -458,7 +432,6 @@ prepare() {
   [[ ! -f $state_root/restored ]] || die "This migration was restored. Remove the state directory before restarting."
   require_clean_repo
   record_revision
-  prepare_work_identity
 
   if ! command -v brew >/dev/null 2>&1 || \
     { ! command -v nix >/dev/null 2>&1 && [[ ! -r /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; }; then
@@ -499,6 +472,8 @@ activate() {
   "$root/bin/switch" work
 
   touch "$state_root/activated"
+  note "This repository does not manage the work Git identity."
+  note "Set it before committing: touch ~/.gitconfig then git config --global user.name and user.email."
   note "Activation completed. Open a new terminal and run bin/migrate-work verify."
 }
 
@@ -554,9 +529,8 @@ verify() {
   /bin/zsh -lic '(( ! $+commands[mise] && ! $+commands[herdr] && ! $+functions[_mise_hook] ))' || \
     die "A fresh Zsh login still exposes Mise or Herdr."
 
-  validate_work_identity
-  git config --global --get-regexp '^includeif\..*\.path$' | \
-    grep -Fq '.config/git/work.inc' || die "The conditional work Git include is not active."
+  ! git config --file "$HOME/.config/git/config" --get user.email >/dev/null 2>&1 || \
+    die "The Nix-managed Git configuration must not define an identity."
   verify_mutable_settings
 
   generate_brewfile
