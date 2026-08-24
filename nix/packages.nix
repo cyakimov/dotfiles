@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 with pkgs;
 [
   air
@@ -75,5 +71,4 @@ with pkgs;
   wire
   xk6
   yazi
-  (pkgs.callPackage ./packages/openspec.nix { src = inputs.openspec; })
 ]

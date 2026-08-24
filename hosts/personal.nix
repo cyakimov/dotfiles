@@ -10,6 +10,7 @@
       packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
         inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
+        (pkgs.callPackage ../nix/packages/openspec.nix { src = inputs.openspec; })
       ];
 
       file = {

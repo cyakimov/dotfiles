@@ -17,6 +17,10 @@ in
       message = "The Pi coding agent is not permitted in the work profile.";
     }
     {
+      assertion = !(lib.any (package: lib.getName package == "openspec") workHome.home.packages);
+      message = "OpenSpec is not permitted in the work profile.";
+    }
+    {
       assertion = !(workHome.home.file ? ".pi/agent/keybindings.json");
       message = "Pi configuration is not permitted in the work profile.";
     }

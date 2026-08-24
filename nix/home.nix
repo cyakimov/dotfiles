@@ -1,5 +1,4 @@
 {
-  inputs,
   pkgs,
   self,
   ...
@@ -18,7 +17,7 @@
     username = "cyakimov";
     homeDirectory = "/Users/cyakimov";
     stateVersion = "26.05";
-    packages = import ./packages.nix { inherit inputs pkgs; };
+    packages = import ./packages.nix { inherit pkgs; };
 
     sessionPath = [
       "/etc/profiles/per-user/cyakimov/bin"
