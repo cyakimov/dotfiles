@@ -34,7 +34,6 @@
     "appcleaner"
     "balenaetcher"
     "chatgpt"
-    "codex"
     "copilot-cli"
     "discord"
     "google-chrome"

@@ -2,11 +2,11 @@
 
 ## Profile contents
 
-Both profiles install Bruno, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, UnnaturalScrollWheels, and WezTerm through Homebrew.
+Both profiles install Bruno, Codex, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, OpenLogi, UnnaturalScrollWheels, and WezTerm through Homebrew.
 
 The personal profile additionally installs Herdr, the Pi coding agent, and OpenSpec from their release flakes.
 Pi is not available in the work profile, where Claude Code and Codex are the permitted agents.
-It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Codex, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
+It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
 
 The work profile additionally installs only Google Cloud CLI.
 Slack is not declared in either profile.
