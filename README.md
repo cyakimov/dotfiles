@@ -31,7 +31,7 @@ lazy.nvim needs to write `lazy-lock.json` there, so plugin updates land as ordin
 │   ├── agents/          # Shared instructions and agent UI configuration
 │   ├── git/             # Personal identity and global ignores
 │   ├── herdr/           # Herdr terminal workspace manager
-│   ├── pi/              # Pi coding agent keybindings
+│   ├── pi/              # Pi coding agent keybindings, personal profile only
 │   ├── nvim/            # Neovim configuration built on LazyVim
 │   ├── shell/           # Aliases and Powerlevel10k configuration
 │   ├── terminals/       # Ghostty and WezTerm configuration

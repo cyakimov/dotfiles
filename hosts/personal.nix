@@ -6,9 +6,17 @@
 }:
 {
   home-manager.users.cyakimov = {
-    home.packages = [
-      inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
-    ];
+    home = {
+      packages = [
+        inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
+        inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
+      ];
+
+      file = {
+        ".pi/agent/AGENTS.md".source = "${self}/AGENTS.md";
+        ".pi/agent/keybindings.json".source = "${self}/config/pi/keybindings.json";
+      };
+    };
 
     programs.git.includes = [
       { path = "~/.config/git/personal.inc"; }

@@ -7,7 +7,5 @@
       executable = true;
     };
     ".codex/AGENTS.md".source = "${self}/AGENTS.md";
-    ".pi/agent/AGENTS.md".source = "${self}/AGENTS.md";
-    ".pi/agent/keybindings.json".source = "${self}/config/pi/keybindings.json";
   };
 }

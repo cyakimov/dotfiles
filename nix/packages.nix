@@ -76,5 +76,4 @@ with pkgs;
   xk6
   yazi
   (pkgs.callPackage ./packages/openspec.nix { src = inputs.openspec; })
-  inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
 ]

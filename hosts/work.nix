@@ -13,6 +13,14 @@ in
       message = "Herdr configuration is not permitted in the work profile.";
     }
     {
+      assertion = !(lib.any (package: lib.getName package == "pi-coding-agent") workHome.home.packages);
+      message = "The Pi coding agent is not permitted in the work profile.";
+    }
+    {
+      assertion = !(workHome.home.file ? ".pi/agent/keybindings.json");
+      message = "Pi configuration is not permitted in the work profile.";
+    }
+    {
       assertion = !(workHome.xdg.configFile ? "git/personal.inc");
       message = "Personal Git identity is not permitted in the work profile.";
     }
