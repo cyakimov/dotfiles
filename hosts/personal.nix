@@ -5,6 +5,16 @@
   ...
 }:
 {
+  # nixpkgs lags upstream claude-code releases; track the latest release
+  # ourselves on the personal profile until nixpkgs catches up.
+  nixpkgs.overlays = [
+    (final: prev: {
+      claude-code = prev.claude-code.override {
+        manifest = final.lib.importJSON ../nix/packages/claude-code-manifest.json;
+      };
+    })
+  ];
+
   home-manager.users.cyakimov = {
     imports = [ ../nix/modules/git.nix ];
 
