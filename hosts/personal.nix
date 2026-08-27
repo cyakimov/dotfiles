@@ -22,6 +22,7 @@
       packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
         inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
+        inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
         (pkgs.callPackage ../nix/packages/openspec.nix { src = inputs.openspec; })
       ];
 
@@ -40,6 +41,11 @@
       "git/personal.inc".source = "${self}/config/git/personal.inc";
     };
   };
+
+  homebrew.brews = [
+    "raine/workmux/workmux"
+    "tuicr"
+  ];
 
   homebrew.casks = [
     "1password-cli"
