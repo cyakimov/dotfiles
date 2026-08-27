@@ -68,7 +68,6 @@ sudo darwin-rebuild switch --switch-generation <number>
 
 The repository disables automatic Nix garbage collection and store optimization.
 Keep at least one known-good generation and the `/etc/*.before-nix-darwin` files.
-Do not empty the Trash containing pre-Nix legacy state until the new configuration has been stable long enough to be trusted.
 
 ## Update Neovim plugins
 

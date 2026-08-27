@@ -61,20 +61,4 @@ Pass `personal` or `work` to build only that profile and the static checks.
 `bin/switch` accepts `personal` or `work`, requires a clean checkout, checks only the selected profile, creates a local Time Machine snapshot, and activates it.
 `bin/update` updates `flake.lock` and keeps the old lock file if either profile fails.
 
-## Migrate the work Mac
-
-The temporary migration helper stages a pre-Nix work laptop safely.
-
-```bash
-bin/migrate-work audit
-bin/migrate-work prepare
-bin/migrate-work activate
-# Open a new terminal.
-bin/migrate-work verify
-bin/migrate-work cleanup
-```
-
-Run `bin/migrate-work help` before starting.
-The helper keeps its inventory and recoverable backups under `~/.local/state/dotfiles-work-migration`.
-
 See [setup](docs/setup.md) for a fresh machine and [operations](docs/operations.md) for updates, rollback, and package ownership.
