@@ -10,7 +10,6 @@ with pkgs;
   clippy
   cmake
   civo
-  claude-code
   colima
   docker-client
   docker-compose

@@ -21,11 +21,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    pi = {
-      url = "github:lukasl-dev/pi.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     hunk.url = "github:modem-dev/hunk";
   };
 

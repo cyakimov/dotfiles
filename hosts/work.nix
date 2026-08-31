@@ -15,7 +15,7 @@ in
       message = "Herdr configuration is not permitted in the work profile.";
     }
     {
-      assertion = !(lib.any (package: lib.getName package == "pi-coding-agent") workHome.home.packages);
+      assertion = !(lib.elem "pi-coding-agent" config.homebrew.brews);
       message = "The Pi coding agent is not permitted in the work profile.";
     }
     {

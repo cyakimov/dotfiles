@@ -5,23 +5,12 @@
   ...
 }:
 {
-  # nixpkgs lags upstream claude-code releases; track the latest release
-  # ourselves on the personal profile until nixpkgs catches up.
-  nixpkgs.overlays = [
-    (final: prev: {
-      claude-code = prev.claude-code.override {
-        manifest = final.lib.importJSON ../nix/packages/claude-code-manifest.json;
-      };
-    })
-  ];
-
   home-manager.users.cyakimov = {
     imports = [ ../nix/modules/git.nix ];
 
     home = {
       packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
-        inputs.pi.packages.${pkgs.stdenv.hostPlatform.system}.coding-agent
         inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
         (pkgs.callPackage ../nix/packages/openspec.nix { src = inputs.openspec; })
       ];
@@ -43,6 +32,7 @@
   };
 
   homebrew.brews = [
+    "pi-coding-agent"
     "raine/workmux/workmux"
     "tuicr"
   ];

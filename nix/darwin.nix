@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   self,
   ...
@@ -8,16 +7,14 @@
   imports = [ ./homebrew.nix ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
-  nixpkgs.config.allowUnfreePredicate =
-    package:
-    builtins.elem (lib.getName package) [
-      "claude-code"
-    ];
 
   nix = {
     enable = true;
     channel.enable = false;
-    gc.automatic = false;
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 30d";
+    };
     optimise.automatic = false;
     settings.experimental-features = [
       "nix-command"

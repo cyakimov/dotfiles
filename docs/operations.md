@@ -2,10 +2,10 @@
 
 ## Profile contents
 
-Both profiles install Bruno, Codex, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, OpenLogi, UnnaturalScrollWheels, and WezTerm through Homebrew.
+Both profiles install Bruno, Claude Code, Codex, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, OpenLogi, UnnaturalScrollWheels, and WezTerm through Homebrew.
 
-The personal profile additionally installs Herdr, the Pi coding agent, and OpenSpec from their release flakes.
-It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
+The personal profile additionally installs Herdr and OpenSpec from their release flakes.
+It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, the Pi coding agent, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
 
 The work profile declares no additional applications.
 Pi, Herdr, and OpenSpec are not available there, where Claude Code and Codex are the permitted agents.
@@ -66,8 +66,8 @@ To select a specific retained generation, use its generation number.
 sudo darwin-rebuild switch --switch-generation <number>
 ```
 
-The repository disables automatic Nix garbage collection and store optimization.
-Keep at least one known-good generation and the `/etc/*.before-nix-darwin` files.
+The repository enables automatic Nix garbage collection, pruning generations and their store paths older than 30 days; store optimization stays disabled.
+Keep at least one known-good generation younger than that window, along with the `/etc/*.before-nix-darwin` files.
 
 ## Update Neovim plugins
 

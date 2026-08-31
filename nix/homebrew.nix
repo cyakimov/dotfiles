@@ -15,6 +15,7 @@ _: {
 
     casks = [
       "bruno"
+      "claude-code"
       "codex"
       "font-hack-nerd-font"
       "font-jetbrains-mono-nerd-font"
