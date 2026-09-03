@@ -20,7 +20,8 @@ Nix manages Git only on the `personal` profile.
 The work profile writes no Git configuration at all, because that machine's Git configuration is managed by MDM.
 
 `config/nvim` is the one directory linked into place as a writable symlink rather than a read-only store copy.
-lazy.nvim needs to write `lazy-lock.json` there, so plugin updates land as ordinary changes in this checkout and must be committed before `bin/switch` will run.
+Nix supplies lazy.nvim so Neovim does not need to download its plugin manager on first launch.
+Lazy.nvim still writes `lazy-lock.json` there for the plugins it manages, so plugin updates land as ordinary changes in this checkout and must be committed before `bin/switch` will run.
 
 ## Repository structure
 

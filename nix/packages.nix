@@ -35,7 +35,6 @@ with pkgs;
   go-migrate
   mkcert
   ncdu
-  neovim
   nilaway
   nmap
   nodejs_latest

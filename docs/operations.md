@@ -72,6 +72,8 @@ Keep at least one known-good generation younger than that window, along with the
 ## Update Neovim plugins
 
 `~/.config/nvim` is a writable symlink to `config/nvim` in this repository, so lazy.nvim edits the checkout directly.
+Nix installs lazy.nvim itself and updates it through `flake.lock` and profile activation.
+All other Neovim plugins remain managed by lazy.nvim.
 
 ```bash
 nvim  # then :Lazy update
