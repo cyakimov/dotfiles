@@ -88,6 +88,35 @@ Committing is not optional housekeeping.
 Enabling an extra with `:LazyExtras` rewrites `config/nvim/lazyvim.json`, which is committed the same way.
 The plugin payload under `~/.local/share/nvim`, along with `~/.local/state/nvim` and `~/.cache/nvim`, is regenerable runtime state and stays unmanaged.
 
+## Update Pi configuration
+
+`~/.pi/agent/settings.json` is a writable symlink to `config/pi/settings.json`, following the same pattern as Neovim above.
+Pi rewrites that file whenever you change theme or run `/install`, so the edit lands in the checkout and is committed like any other change.
+
+```bash
+git diff -- config/pi/settings.json
+git add config/pi/settings.json
+git commit -m "chore: update Pi settings"
+```
+
+Extension versions in `packages` are pinned deliberately.
+Bump them in the same commit as any behavior change they cause.
+
+`~/.pi/agent/extensions` is a read-only store symlink to `config/pi/extensions`, which holds two vendored extensions.
+`terminal-status-title.js` shows agent state in the terminal tab title.
+`calm/` is an opt-in `/calm` toggle that hides collapsed thinking and built-in tool shells from the transcript; it changes presentation only and defaults to off.
+
+Both are vendored from an upstream repository rather than installed from npm, so they need manual re-syncing.
+`tests/pi-extensions.test.sh` typechecks `calm/` against the installed Pi and is the signal that Pi's extension API drifted.
+The flake static check runs that suite but skips the typecheck, which needs Pi installed; run it directly to exercise everything.
+
+```bash
+bash tests/pi-extensions.test.sh
+```
+
+`calm/index.ts` carries one local delta from upstream, marked in a comment, adapting the `onTerminalInput` handler to the Pi 0.84 signature.
+Preserve it, or re-apply it, when re-syncing.
+
 ## Secrets and mutable state
 
 Authentication, SSH keys, application databases, histories, caches, and employer configuration are not managed here.
@@ -97,3 +126,7 @@ Git follows that rule.
 `hosts/personal.nix` imports `nix/modules/git.nix`, so Git behavior and the personal identity exist only on that profile.
 The work profile writes nothing Git-config-shaped, leaving the MDM-managed `~/.config/git/config` untouched.
 Work keeps the `git-lfs` binary from `nix/packages.nix`, but registers no LFS filters; run `git lfs install` locally if a repository needs them.
+
+Pi follows that rule too.
+`~/.pi/agent/calm` records the Calm toggle and `~/.pi/agent/web-search.json` would hold search provider API keys.
+Both are Pi runtime state, deliberately untracked and unmanaged; `pi-web-access` needs no key because it reuses the Codex login.

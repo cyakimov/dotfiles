@@ -32,12 +32,13 @@ Lazy.nvim still writes `lazy-lock.json` there for the plugins it manages, so plu
 │   ├── agents/          # Shared instructions and agent UI configuration
 │   ├── git/             # Personal identity and global ignores
 │   ├── herdr/           # Herdr terminal workspace manager
-│   ├── pi/              # Pi coding agent keybindings, personal profile only
+│   ├── pi/              # Pi coding agent settings and extensions, personal profile only
 │   ├── nvim/            # Neovim configuration built on LazyVim
 │   ├── shell/           # Aliases and Powerlevel10k configuration
 │   ├── terminals/       # Ghostty and WezTerm configuration
 │   └── tmux/            # tmux configuration
 ├── docs/                # Setup and operational runbooks
+├── tests/               # Behavior tests run by the flake static check
 ├── hosts/               # Personal and work profile differences
 ├── nix/
 │   ├── modules/         # Shared Home Manager modules

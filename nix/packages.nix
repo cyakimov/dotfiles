@@ -65,6 +65,7 @@ with pkgs;
   tree-sitter
   trivy
   turso-cli
+  typescript
   uv
   watch
   wire

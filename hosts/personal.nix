@@ -6,7 +6,10 @@
 }:
 {
   home-manager.users.cyakimov = {
-    imports = [ ../nix/modules/git.nix ];
+    imports = [
+      ../nix/modules/git.nix
+      ../nix/modules/pi.nix
+    ];
 
     home = {
       packages = [
@@ -14,11 +17,6 @@
         inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.hunk
         (pkgs.callPackage ../nix/packages/openspec.nix { src = inputs.openspec; })
       ];
-
-      file = {
-        ".pi/agent/AGENTS.md".source = "${self}/AGENTS.md";
-        ".pi/agent/keybindings.json".source = "${self}/config/pi/keybindings.json";
-      };
     };
 
     programs.git.includes = [

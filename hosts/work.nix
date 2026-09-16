@@ -23,7 +23,7 @@ in
       message = "OpenSpec is not permitted in the work profile.";
     }
     {
-      assertion = !(workHome.home.file ? ".pi/agent/keybindings.json");
+      assertion = !(lib.any (lib.hasPrefix ".pi/") (lib.attrNames workHome.home.file));
       message = "Pi configuration is not permitted in the work profile.";
     }
     {

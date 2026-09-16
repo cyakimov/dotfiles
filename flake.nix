@@ -78,6 +78,7 @@
                 git
                 jq
                 nixfmt
+                nodejs_latest
                 python3
                 shellcheck
                 statix
@@ -87,13 +88,20 @@
               cp -R ${self} source
               chmod -R u+w source
               find source/bin -type f -print0 | xargs -0 -n1 bash -n
+              find source/tests -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
               shellcheck source/bin/* source/config/agents/claude-statusline.sh
+              (cd source && shellcheck -x tests/*.test.sh)
+              find source/config/pi/extensions -type f -name '*.js' -print0 | \
+                xargs -0 -n1 node --check
               find source -type f -name '*.nix' -exec nixfmt --check {} +
               deadnix --fail source
               statix check source
               find source/config -type f -name '*.json' -print0 | xargs -0 -n1 jq empty
               find source/config -type f -name '*.toml' -print0 | \
                 xargs -0 -n1 python3 -c 'import pathlib, sys, tomllib; tomllib.loads(pathlib.Path(sys.argv[1]).read_text())'
+              # The Calm TypeScript check needs an installed Pi and skips here.
+              # Run tests/pi-extensions.test.sh directly to exercise it.
+              (cd source && bash tests/pi-extensions.test.sh)
               touch $out
             '';
       };
@@ -102,8 +110,10 @@
         packages = with pkgs; [
           deadnix
           nixfmt
+          nodejs_latest
           shellcheck
           statix
+          typescript
         ];
       };
     };
