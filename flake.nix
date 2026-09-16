@@ -14,7 +14,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    herdr.url = "github:herdrdev/herdr/v0.8.2";
+    herdr.url = "github:herdrdev/herdr/v0.9.1";
 
     openspec = {
       url = "github:Fission-AI/OpenSpec";
