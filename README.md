@@ -12,6 +12,7 @@ Both configurations share command-line tools, shell and Git behavior, agent reso
 ## Ownership
 
 Nix owns command-line tools, language runtimes, shell integration, tmux, Neovim, and stable agent resources.
+NVM owns interactive Node.js versions; Nix keeps its pinned Node.js runtime for repository checks and package builds.
 Homebrew owns GUI applications, fonts, and some exceptions.
 Homebrew removes packages that are not declared by the selected profile during activation.
 

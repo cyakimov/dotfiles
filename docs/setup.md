@@ -1,6 +1,6 @@
 # Setup
 
-This setup starts from Nix and Homebrew as the only package managers owned by the repository.
+This setup uses Nix and Homebrew for system packages, with NVM managing interactive Node.js versions.
 It does not require Stow or Mise.
 
 ## 1. Clone and inspect
@@ -53,12 +53,28 @@ Homebrew removes installed packages and applications that are not declared by th
 
 Open a new terminal when activation completes.
 
-## 6. Verify
+## 6. Install the default Node.js version
+
+Nix provides the pinned nvm shell integration in both profiles.
+Install the current LTS release and make the LTS alias the default for directories without an `.nvmrc`.
+
+```bash
+nvm install --lts
+nvm alias default 'lts/*'
+```
+
+When you enter a directory tree with an `.nvmrc`, the shell switches to that installed version.
+If it is missing, the shell prints a hint; install it from that project with `nvm install`.
+
+## 7. Verify
 
 ```bash
 darwin-rebuild --list-generations
 git config --show-origin --get user.email
-command -v nix gh go node rustc
+command -v nix gh go rustc
+nvm current
+node --version
+npm --version
 ```
 
 Confirm that the expected terminal applications launch.

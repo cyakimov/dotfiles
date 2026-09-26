@@ -37,7 +37,6 @@ with pkgs;
   ncdu
   nilaway
   nmap
-  nodejs_latest
   overmind
   oapi-codegen
   # Nixpkgs' install tests pull unrelated language toolchains that are not runtime dependencies.
@@ -65,7 +64,6 @@ with pkgs;
   tree-sitter
   trivy
   turso-cli
-  typescript
   uv
   watch
   wire

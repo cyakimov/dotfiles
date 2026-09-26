@@ -12,7 +12,9 @@ Pi, Herdr, and OpenSpec are not available there, where Claude Code and Codex are
 Slack is not declared in either profile.
 
 The shared Homebrew formula exceptions are mactop and Mole.
-All other command-line tools belong in `nix/packages.nix`.
+Interactive Node.js versions are managed by NVM in `~/.nvm`; Nix provides nvm itself from a pinned upstream release.
+The static flake checks and Nix-built packages keep their own pinned Node.js runtimes.
+Other shared command-line tools belong in `nix/packages.nix`.
 
 ## Update dependencies
 

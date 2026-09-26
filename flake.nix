@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nvm = {
+      url = "github:nvm-sh/nvm/v0.40.8";
+      flake = false;
+    };
+
     herdr.url = "github:herdrdev/herdr/v0.9.1";
 
     openspec = {
@@ -110,10 +115,8 @@
         packages = with pkgs; [
           deadnix
           nixfmt
-          nodejs_latest
           shellcheck
           statix
-          typescript
         ];
       };
     };
