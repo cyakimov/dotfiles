@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code status line script
-# Layout: project · ⎇ branch ● ↑↓ · ◆ model · ✦ effort · ▓░ ctx% · +N/-N · elapsed · ⊞ worktree · [session] · vim
+# Layout: project · ⎇ branch ● ↑↓ · PR#N · ◆ model · ✦ effort · ▓░ ctx% · 5h/7d% · ❄ cache · +N/-N · elapsed · ⊞ worktree · [session] · vim
 
 input=$(cat)
 
@@ -17,6 +17,14 @@ lines_added=0
 lines_removed=0
 worktree_name=""
 worktree_branch=""
+pr_number=""
+pr_state=""
+pr_kind=""
+rl_5h=""
+rl_7d=""
+cache_warm=""
+cache_observed=""
+cache_cause=""
 
 # --- Extract all fields in a single jq call ---
 eval "$(echo "$input" | jq -r '
@@ -31,7 +39,15 @@ eval "$(echo "$input" | jq -r '
   "lines_added=" + (.cost.total_lines_added // 0 | tostring | @sh),
   "lines_removed=" + (.cost.total_lines_removed // 0 | tostring | @sh),
   "worktree_name=" + (.worktree.name // .workspace.git_worktree // "" | @sh),
-  "worktree_branch=" + (.worktree.branch // "" | @sh)
+  "worktree_branch=" + (.worktree.branch // "" | @sh),
+  "pr_number=" + (.pr.number // "" | tostring | @sh),
+  "pr_state=" + (.pr.review_state // "open" | @sh),
+  "pr_kind=" + (.pr.kind // "" | @sh),
+  "rl_5h=" + (.rate_limits.five_hour.used_percentage // "" | tostring | @sh),
+  "rl_7d=" + (.rate_limits.seven_day.used_percentage // "" | tostring | @sh),
+  "cache_warm=" + (.prompt_cache.warm // false | tostring | @sh),
+  "cache_observed=" + (.prompt_cache.caching_observed // false | tostring | @sh),
+  "cache_cause=" + (.prompt_cache.last_miss_cause.causes[0] // "" | @sh)
 ')"
 
 # --- 1. Project name ---
@@ -75,6 +91,23 @@ if [ -n "$git_dir" ]; then
   fi
 fi
 
+# --- 2b. Open PR / MR badge ---
+part_pr=""
+if [ -n "$pr_number" ]; then
+  if [ "$pr_kind" = "mr" ]; then
+    pr_label="!${pr_number}"
+  else
+    pr_label="#${pr_number}"
+  fi
+  case "$pr_state" in
+    approved)          pr_color="32" ;;  # green
+    changes_requested) pr_color="31" ;;  # red
+    draft)             pr_color="2"  ;;  # dim
+    *)                 pr_color="33" ;;  # yellow (pending/open)
+  esac
+  part_pr=$(printf "\033[%sm%s\033[0m" "$pr_color" "$pr_label")
+fi
+
 # --- 3. Model short name ---
 model_short=$(echo "$model" | sed 's/^Claude //' | sed 's/ ([^)]*)//')
 if [ -z "$model_short" ] && [ -n "$model_id" ]; then
@@ -86,14 +119,17 @@ if [ -z "$model_short" ] && [ -n "$model_id" ]; then
 fi
 part_model=$(printf "◆ \033[35m%s\033[0m" "$model_short")
 
-# --- 3b. Thinking effort (from ~/.claude/settings.json) ---
+# --- 3b. Thinking effort (live session value; settings default as fallback) ---
 part_effort=""
-effort=$(jq -r '.effortLevel // empty' "$HOME/.claude/settings.json" 2>/dev/null)
+effort=$(printf '%s' "$input" | jq -r '.effort.level // empty' 2>/dev/null)
+[ -z "$effort" ] && effort=$(jq -r '.effortLevel // empty' "$HOME/.claude/settings.json" 2>/dev/null)
 if [ -n "$effort" ]; then
   case "$effort" in
     low)    effort_label="Low";    effort_color="32" ;;
     medium) effort_label="Medium"; effort_color="33" ;;
     high)   effort_label="High";   effort_color="35" ;;
+    xhigh)  effort_label="XHigh";  effort_color="31" ;;
+    max)    effort_label="Max";    effort_color="1;31" ;;
     *)      effort_label=$(printf '%s' "$effort" | awk '{ print toupper(substr($0, 1, 1)) substr($0, 2) }')
             effort_color="37" ;;
   esac
@@ -115,6 +151,42 @@ elif [ "$used_int" -ge 50 ]; then bar_color="33"  # yellow
 else                              bar_color="32"   # green
 fi
 part_bar=$(printf "\033[%sm%s %s%%\033[0m" "$bar_color" "$bar" "$used_int")
+
+# --- 5. Rate limits (5h / 7d subscription usage) ---
+part_rl=""
+rl_str=""
+if [ -n "$rl_5h" ]; then
+  five_int=$(printf "%.0f" "$rl_5h" 2>/dev/null || echo "")
+  if [ -n "$five_int" ]; then
+    if   [ "$five_int" -ge 90 ]; then five_color="31"
+    elif [ "$five_int" -ge 70 ]; then five_color="33"
+    else                              five_color="2"
+    fi
+    rl_str="$(printf "\033[%sm5h:%s%%\033[0m" "$five_color" "$five_int")"
+  fi
+fi
+if [ -n "$rl_7d" ]; then
+  week_int=$(printf "%.0f" "$rl_7d" 2>/dev/null || echo "")
+  if [ -n "$week_int" ]; then
+    if   [ "$week_int" -ge 90 ]; then week_color="31"
+    elif [ "$week_int" -ge 70 ]; then week_color="33"
+    else                              week_color="2"
+    fi
+    [ -n "$rl_str" ] && rl_str="${rl_str} "
+    rl_str="${rl_str}$(printf "\033[%sm7d:%s%%\033[0m" "$week_color" "$week_int")"
+  fi
+fi
+part_rl="$rl_str"
+
+# --- 5b. Cold prompt-cache flag ---
+part_cache=""
+if [ "$cache_observed" = "true" ] && [ "$cache_warm" = "false" ]; then
+  if [ -n "$cache_cause" ] && [ "$cache_cause" != "unknown" ]; then
+    part_cache=$(printf "\033[34m❄ %s\033[0m" "$cache_cause")
+  else
+    part_cache=$(printf "\033[34m❄\033[0m")
+  fi
+fi
 
 # --- 6. Lines added/removed ---
 part_lines=""
@@ -168,9 +240,12 @@ fi
 # --- Assemble ---
 output="${part_project}"
 [ -n "$part_git" ]      && output="${output}${SEP}${part_git}"
+[ -n "$part_pr" ]       && output="${output}${SEP}${part_pr}"
 output="${output}${SEP}${part_model}"
 [ -n "$part_effort" ]   && output="${output}${SEP}${part_effort}"
 output="${output}${SEP}${part_bar}"
+[ -n "$part_rl" ]       && output="${output}${SEP}${part_rl}"
+[ -n "$part_cache" ]    && output="${output}${SEP}${part_cache}"
 [ -n "$part_lines" ]    && output="${output}${SEP}${part_lines}"
 [ -n "$part_elapsed" ]  && output="${output}${SEP}${part_elapsed}"
 [ -n "$part_worktree" ] && output="${output}${SEP}${part_worktree}"
