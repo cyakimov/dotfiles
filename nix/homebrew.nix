@@ -6,6 +6,7 @@ _: {
       autoUpdate = false;
       cleanup = "uninstall";
       upgrade = false;
+      extraEnv.XDG_CONFIG_HOME = "/Users/cyakimov/.config";
     };
 
     brews = [
