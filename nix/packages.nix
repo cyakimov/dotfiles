@@ -32,7 +32,10 @@ with pkgs;
   jq
   just
   lazygit
-  go-migrate
+  (go-migrate.overrideAttrs (old: {
+    # Snowflake's init panics while parsing the Nix CA bundle.
+    tags = (lib.remove "snowflake" old.tags) ++ [ "sqlite" ];
+  }))
   mkcert
   ncdu
   nilaway
