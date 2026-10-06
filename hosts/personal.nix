@@ -11,6 +11,9 @@
       ../nix/modules/pi.nix
     ];
 
+    home.file."Development/Personal/AGENTS.md".source =
+      "${self}/config/agents/personal-development/AGENTS.md";
+
     home = {
       packages = [
         inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.herdr
