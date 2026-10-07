@@ -52,6 +52,8 @@ config.keys = {
 	{ key = "Enter", mods = "SUPER|SHIFT", action = act.TogglePaneZoomState },
 	{ key = "w", mods = "SUPER", action = act.CloseCurrentPane({ confirm = true }) },
 	{ key = "w", mods = "SUPER|ALT", action = act.CloseCurrentTab({ confirm = true }) },
+	{ key = "LeftArrow", mods = "OPT", action = act.SendKey({ key = "b", mods = "ALT" }) },
+	{ key = "RightArrow", mods = "OPT", action = act.SendKey({ key = "f", mods = "ALT" }) },
 }
 
 for _, direction in ipairs({ "Left", "Right", "Up", "Down" }) do
