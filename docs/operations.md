@@ -32,6 +32,24 @@ bin/switch personal
 `bin/update` refuses a dirty checkout.
 If either profile fails to build, it restores the previous lock file.
 
+## Upgrade Herdr
+
+Herdr is pinned to a release tag in `flake.nix` and installed in the personal profile.
+Its self-updater is disabled for Nix installs.
+To upgrade it, change the tag, refresh the Herdr input, check both profiles, and activate the personal profile.
+
+```bash
+nix --extra-experimental-features "nix-command flakes" flake update herdr
+bin/check
+git diff -- flake.nix flake.lock
+git add flake.nix flake.lock
+git commit -m "chore: update Herdr"
+bin/switch personal
+```
+
+Run the command above from the repository root after changing the tag.
+The general `bin/update` command updates every flake input and requires a clean checkout.
+
 ## Change packages
 
 Put shared GUI applications in `nix/homebrew.nix`.
