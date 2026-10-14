@@ -57,6 +57,9 @@ in
       enable = true;
       enableCompletion = true;
       initExtra = ''
+        if command -v rbenv >/dev/null 2>&1; then
+          eval "$(rbenv init - --no-rehash bash)"
+        fi
         ${nvmInit}
         _nvm_auto_use
         case ";''${PROMPT_COMMAND:-};" in
@@ -144,6 +147,9 @@ in
           bindkey $'\e\e[C' forward-word
         '')
         (lib.mkOrder 1300 ''
+          if command -v rbenv >/dev/null 2>&1; then
+            eval "$(rbenv init - --no-rehash zsh)"
+          fi
           ${nvmInit}
           autoload -U add-zsh-hook
           add-zsh-hook chpwd _nvm_auto_use

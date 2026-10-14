@@ -12,6 +12,7 @@ _: {
     brews = [
       "mactop"
       "mole"
+      "rbenv"
     ];
 
     casks = [

@@ -54,7 +54,6 @@ with pkgs;
   protoc-gen-go-grpc
   python311
   ripgrep
-  ruby_4_0
   rustc
   rustfmt
   shellcheck
