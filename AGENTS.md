@@ -4,6 +4,8 @@ These are common instructions for Carlos's agents across all scenarios.
 
 ## General Guidelines
 
+- When the user asks to "finish the session", merge the work and clean up its worktrees and temporary test resources.
+
 - Never use the em dash "—". Use plain dash "-" instead
 - When writing commit messages, NEVER auto-add your agent name as co-author
 - Never manually modify CHANGELOG.md files or any files that are marked as auto-generated
