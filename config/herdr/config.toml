@@ -6,6 +6,11 @@ onboarding = false
 name = "rose-pine"
 
 auto_switch = false
+
+[theme.custom]
+active_row_bg = "#44405c"
+selection_bg = "#59516e"
+
 [terminal]
 # New panes, tabs, and workspaces inherit their source context.
 new_cwd = "follow"
