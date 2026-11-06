@@ -49,7 +49,7 @@ bin/switch personal
 
 Use `bin/switch work` on a work Mac.
 Activation requires a clean checkout and creates a local Time Machine snapshot immediately before changing the system.
-Homebrew removes installed packages and applications that are not declared by the selected profile.
+Homebrew activation preserves manually installed formulae and casks in both profiles.
 
 Open a new terminal when activation completes.
 

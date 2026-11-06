@@ -5,7 +5,7 @@
 Both profiles install Bruno, Claude Code, Codex, Hack Nerd Font, JetBrains Mono Nerd Font, Ghostty, OpenLogi, UnnaturalScrollWheels, and WezTerm through Homebrew.
 
 The personal profile additionally installs Herdr and OpenSpec from their release flakes.
-It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, JetBrains Toolbox, Ollamac, OpenSuperWhisper, the Pi coding agent, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
+It installs 1Password CLI, AppCleaner, balenaEtcher, ChatGPT, Copilot CLI, Discord, Google Chrome, Herdr app, JetBrains Toolbox, Ollamac, OpenSuperWhisper, the Pi coding agent, Spotify, Transmission, Visual Studio Code, VLC, and Zoom through Homebrew.
 
 The work profile declares no additional applications.
 Pi, Herdr, and OpenSpec are not available there, where Claude Code and Codex are the permitted agents.
@@ -56,16 +56,9 @@ Put shared GUI applications in `nix/homebrew.nix`.
 Put profile-specific GUI applications in the matching file under `hosts/`.
 Put portable command-line tools in `nix/packages.nix`.
 
-Before activation, review the exact Homebrew removal set with a generated Brewfile.
-
-```bash
-nix eval --raw .#darwinConfigurations.personal.config.homebrew.brewfile > /tmp/dotfiles.Brewfile
-brew bundle cleanup --file=/tmp/dotfiles.Brewfile
-```
-
-Use the `work` output when reviewing a work Mac.
-The cleanup command above is a preview because it omits `--force`.
-The nix-darwin activation applies the declared `uninstall` cleanup mode without using Homebrew's destructive `zap` option.
+Homebrew activation installs declared packages and preserves manually installed formulae and casks in both profiles.
+Removing a package from the configuration does not uninstall it.
+Uninstall unwanted packages explicitly with `brew uninstall <formula>` or `brew uninstall --cask <cask>`.
 
 ## Roll back
 
@@ -115,11 +108,11 @@ The personal profile links `~/.config/herdr-app/settings.json`, `keys.json`, and
 Review and commit edits made through Herdr with `git diff -- config/herdr-app` before the next activation.
 The existing Herdr terminal configuration remains separate.
 Layouts, mods, workspace state, telemetry, and all other Herdr runtime files stay local and unmanaged.
-App installation and updates remain outside this configuration.
+Homebrew manages Herdr app installation; activation leaves upgrades to Homebrew.
 
 Before the first activation, quit Herdr and move only those three existing destination files into a backup directory outside the checkout, preserving their relative paths.
 Commit the repository changes and run `bin/switch personal` from the clean checkout.
-After activation, launch Herdr and verify the Rose Pine Moon appearance and shortcuts.
+After activation, launch Herdr and verify the Light appearance and shortcuts.
 Make a reversible settings UI change, confirm `git diff -- config/herdr-app/settings.json` shows it and the destination remains a symlink, then restore the original setting.
 Restart Herdr and confirm the links still exist and workspace state is intact.
 If saving replaces a symlink, quit Herdr, remove only the newly managed links or replacement files, and restore the three backup files before investigating compatibility.

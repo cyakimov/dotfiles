@@ -47,6 +47,7 @@
     "copilot-cli"
     "discord"
     "google-chrome"
+    "herdr-app"
     "jetbrains-toolbox"
     "ollamac"
     "opensuperwhisper"

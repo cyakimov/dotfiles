@@ -4,7 +4,7 @@ _: {
 
     onActivation = {
       autoUpdate = false;
-      cleanup = "uninstall";
+      cleanup = "none";
       upgrade = false;
       extraEnv.XDG_CONFIG_HOME = "/Users/cyakimov/.config";
     };

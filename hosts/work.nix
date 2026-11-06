@@ -3,8 +3,6 @@ let
   workHome = config.home-manager.users.cyakimov;
 in
 {
-  homebrew.onActivation.cleanup = lib.mkForce "none";
-
   assertions = [
     {
       assertion = !(lib.any (package: lib.getName package == "herdr") workHome.home.packages);

@@ -14,7 +14,7 @@ Both configurations share command-line tools, shell and Git behavior, agent reso
 Nix owns command-line tools, language runtimes, shell integration, tmux, Neovim, and stable agent resources.
 NVM owns interactive Node.js versions; Nix keeps its pinned Node.js runtime for repository checks and package builds.
 Homebrew owns GUI applications, fonts, and some exceptions.
-Homebrew removes packages that are not declared by the selected profile during activation.
+Homebrew activation preserves manually installed formulae and casks in both profiles.
 
 Credentials, work identity, mutable application state, and secrets stay outside Git.
 Nix manages Git only on the `personal` profile.
