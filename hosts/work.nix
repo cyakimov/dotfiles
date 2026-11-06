@@ -15,6 +15,10 @@ in
       message = "Herdr configuration is not permitted in the work profile.";
     }
     {
+      assertion = !(lib.any (lib.hasPrefix "herdr-app/") (lib.attrNames workHome.xdg.configFile));
+      message = "Herdr GUI configuration is not permitted in the work profile.";
+    }
+    {
       assertion = !(lib.elem "pi-coding-agent" config.homebrew.brews);
       message = "The Pi coding agent is not permitted in the work profile.";
     }

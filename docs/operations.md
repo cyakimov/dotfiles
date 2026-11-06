@@ -109,6 +109,21 @@ Committing is not optional housekeeping.
 Enabling an extra with `:LazyExtras` rewrites `config/nvim/lazyvim.json`, which is committed the same way.
 The plugin payload under `~/.local/share/nvim`, along with `~/.local/state/nvim` and `~/.cache/nvim`, is regenerable runtime state and stays unmanaged.
 
+## Update Herdr GUI configuration
+
+The personal profile links `~/.config/herdr-app/settings.json`, `keys.json`, and `themes/rose-pine-moon.json` to their counterparts in `config/herdr-app` as writable checkout symlinks.
+Review and commit edits made through Herdr with `git diff -- config/herdr-app` before the next activation.
+The existing Herdr terminal configuration remains separate.
+Layouts, mods, workspace state, telemetry, and all other Herdr runtime files stay local and unmanaged.
+App installation and updates remain outside this configuration.
+
+Before the first activation, quit Herdr and move only those three existing destination files into a backup directory outside the checkout, preserving their relative paths.
+Commit the repository changes and run `bin/switch personal` from the clean checkout.
+After activation, launch Herdr and verify the Rose Pine Moon appearance and shortcuts.
+Make a reversible settings UI change, confirm `git diff -- config/herdr-app/settings.json` shows it and the destination remains a symlink, then restore the original setting.
+Restart Herdr and confirm the links still exist and workspace state is intact.
+If saving replaces a symlink, quit Herdr, remove only the newly managed links or replacement files, and restore the three backup files before investigating compatibility.
+
 ## Update Pi configuration
 
 `~/.pi/agent/settings.json` is a writable symlink to `config/pi/settings.json`, following the same pattern as Neovim above.

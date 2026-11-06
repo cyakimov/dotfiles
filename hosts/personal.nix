@@ -8,6 +8,7 @@
   home-manager.users.cyakimov = {
     imports = [
       ../nix/modules/git.nix
+      ../nix/modules/herdr-app.nix
       ../nix/modules/pi.nix
     ];
 

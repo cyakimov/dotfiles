@@ -1,0 +1,13 @@
+{
+  "zoom": 1,
+  "sounds": {
+    "enabled": true
+  },
+  "font_ligatures": false,
+  "minimum_contrast": 1,
+  "theme": "rose-pine-moon",
+  "colors": {
+    "selected": "#44405c",
+    "selection": "#59516e"
+  }
+}

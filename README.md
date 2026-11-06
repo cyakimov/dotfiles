@@ -20,7 +20,8 @@ Credentials, work identity, mutable application state, and secrets stay outside 
 Nix manages Git only on the `personal` profile.
 The work profile writes no Git configuration at all, because that machine's Git configuration is managed by MDM.
 
-`config/nvim` is the one directory linked into place as a writable symlink rather than a read-only store copy.
+`config/nvim` is linked into place as a writable directory symlink rather than a read-only store copy.
+Pi settings and the managed Herdr GUI files also use writable checkout symlinks so UI edits become Git changes.
 Nix supplies lazy.nvim so Neovim does not need to download its plugin manager on first launch.
 Lazy.nvim still writes `lazy-lock.json` there for the plugins it manages, so plugin updates land as ordinary changes in this checkout and must be committed before `bin/switch` will run.
 
@@ -33,6 +34,7 @@ Lazy.nvim still writes `lazy-lock.json` there for the plugins it manages, so plu
 │   ├── agents/          # Shared instructions and agent UI configuration
 │   ├── git/             # Personal identity and global ignores
 │   ├── herdr/           # Herdr terminal workspace manager
+│   ├── herdr-app/       # Herdr GUI settings, keybindings, and custom theme
 │   ├── pi/              # Pi coding agent settings and extensions, personal profile only
 │   ├── nvim/            # Neovim configuration built on LazyVim
 │   ├── shell/           # Aliases and Powerlevel10k configuration
