@@ -19,7 +19,7 @@
       flake = false;
     };
 
-    herdr.url = "github:herdrdev/herdr/v0.9.3";
+    herdr.url = "github:herdrdev/herdr/v0.9.5";
 
     openspec = {
       url = "github:Fission-AI/OpenSpec";
