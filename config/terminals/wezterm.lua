@@ -3,35 +3,12 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
-config.color_scheme = "rose-pine-moon"
-
--- WezTerm's builtin rose-pine-moon (Gogh-derived) sets selection_bg equal to the
--- background, which makes selections invisible, and swaps green and blue. These
--- values come from Ghostty's official Rose Pine Moon theme so both terminals match.
-config.colors = {
-	selection_bg = "#44415a",
-	selection_fg = "#e0def4",
-	ansi = {
-		"#393552",
-		"#eb6f92",
-		"#3e8fb0",
-		"#f6c177",
-		"#9ccfd8",
-		"#c4a7e7",
-		"#ea9a97",
-		"#e0def4",
-	},
-	brights = {
-		"#6e6a86",
-		"#eb6f92",
-		"#3e8fb0",
-		"#f6c177",
-		"#9ccfd8",
-		"#c4a7e7",
-		"#ea9a97",
-		"#e0def4",
-	},
-}
+local dawn = wezterm.color.get_builtin_schemes()["rose-pine-dawn"]
+-- Match Ghostty's visible selection and ANSI green and blue slots.
+dawn.selection_bg = "#dfdad9"
+dawn.ansi[3], dawn.ansi[5] = "#286983", "#56949f"
+dawn.brights[3], dawn.brights[5] = "#286983", "#56949f"
+config.colors = dawn
 
 config.font = wezterm.font("Hack Nerd Font")
 config.font_size = 15.0
