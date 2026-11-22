@@ -38,7 +38,7 @@ Lazy.nvim still writes `lazy-lock.json` there for the plugins it manages, so plu
 │   ├── pi/              # Pi coding agent settings and extensions, personal profile only
 │   ├── nvim/            # Neovim configuration built on LazyVim
 │   ├── shell/           # Aliases and Powerlevel10k configuration
-│   ├── terminals/       # Ghostty and WezTerm configuration
+│   ├── terminals/       # Ghostty, WezTerm, and Rex configuration
 │   └── tmux/            # tmux configuration
 ├── docs/                # Setup and operational runbooks
 ├── tests/               # Behavior tests run by the flake static check
