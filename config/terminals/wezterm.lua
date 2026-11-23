@@ -3,7 +3,7 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
--- Orchard Breeze from Rex
+-- Orchard Breeze with text colors adjusted for a translucent light background.
 local paper = "#f4f9ef"
 local ink = "#3a4a35"
 local sage = "#d9e5cf"
@@ -15,8 +15,8 @@ config.colors = {
 	foreground = ink,
 	selection_bg = highlight,
 	selection_fg = ink,
-	cursor_bg = "#5da24f",
-	cursor_border = "#5da24f",
+	cursor_bg = "#477b3c",
+	cursor_border = "#477b3c",
 	cursor_fg = paper,
 	split = sage,
 	tab_bar = {
@@ -27,8 +27,8 @@ config.colors = {
 		new_tab = idle_tab,
 		new_tab_hover = hovered_tab,
 	},
-	ansi = { "#3a4a35", "#c65043", "#4f9440", "#a8831f", "#4478b0", "#90569c", "#37897a", "#d9e5cf" },
-	brights = { "#75856b", "#dd6455", "#5fae4e", "#c1992b", "#558dc6", "#a76bb3", "#45a191", "#fcfef9" },
+	ansi = { "#3a4a35", "#763028", "#2a4e22", "#574310", "#294869", "#5d3865", "#1f4d45", "#444741" },
+	brights = { "#4b5645", "#863c33", "#325c29", "#655017", "#345578", "#6b4473", "#275b52", "#525351" },
 }
 config.default_cursor_style = "BlinkingBlock"
 config.cursor_blink_rate = 500
