@@ -3,12 +3,23 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
-local dawn = wezterm.color.get_builtin_schemes()["rose-pine-dawn"]
--- Match Ghostty's visible selection and ANSI green and blue slots.
-dawn.selection_bg = "#dfdad9"
-dawn.ansi[3], dawn.ansi[5] = "#286983", "#56949f"
-dawn.brights[3], dawn.brights[5] = "#286983", "#56949f"
-config.colors = dawn
+-- Orchard Breeze from Rex
+config.colors = {
+	background = "#f4f9ef",
+	foreground = "#3a4a35",
+	selection_bg = "#d4ecc4",
+	selection_fg = "#3a4a35",
+	cursor_bg = "#5da24f",
+	cursor_border = "#5da24f",
+	cursor_fg = "#f4f9ef",
+	ansi = { "#3a4a35", "#c65043", "#4f9440", "#a8831f", "#4478b0", "#90569c", "#37897a", "#d9e5cf" },
+	brights = { "#75856b", "#dd6455", "#5fae4e", "#c1992b", "#558dc6", "#a76bb3", "#45a191", "#fcfef9" },
+}
+config.default_cursor_style = "BlinkingBlock"
+config.cursor_blink_rate = 500
+config.cursor_blink_ease_in = "Constant"
+config.cursor_blink_ease_out = "Constant"
+config.force_reverse_video_cursor = false
 
 config.font = wezterm.font("Hack Nerd Font")
 config.font_size = 15.0
