@@ -4,14 +4,29 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 -- Orchard Breeze from Rex
+local paper = "#f4f9ef"
+local ink = "#3a4a35"
+local sage = "#d9e5cf"
+local highlight = "#d4ecc4"
+local idle_tab = { bg_color = sage, fg_color = ink }
+local hovered_tab = { bg_color = highlight, fg_color = ink }
 config.colors = {
-	background = "#f4f9ef",
-	foreground = "#3a4a35",
-	selection_bg = "#d4ecc4",
-	selection_fg = "#3a4a35",
+	background = paper,
+	foreground = ink,
+	selection_bg = highlight,
+	selection_fg = ink,
 	cursor_bg = "#5da24f",
 	cursor_border = "#5da24f",
-	cursor_fg = "#f4f9ef",
+	cursor_fg = paper,
+	split = sage,
+	tab_bar = {
+		active_tab = { bg_color = paper, fg_color = ink },
+		inactive_tab = idle_tab,
+		inactive_tab_hover = hovered_tab,
+		inactive_tab_edge = sage,
+		new_tab = idle_tab,
+		new_tab_hover = hovered_tab,
+	},
 	ansi = { "#3a4a35", "#c65043", "#4f9440", "#a8831f", "#4478b0", "#90569c", "#37897a", "#d9e5cf" },
 	brights = { "#75856b", "#dd6455", "#5fae4e", "#c1992b", "#558dc6", "#a76bb3", "#45a191", "#fcfef9" },
 }
@@ -27,6 +42,22 @@ config.window_background_opacity = 0.8
 config.macos_window_background_blur = 50
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
+config.window_frame = {
+	active_titlebar_bg = sage,
+	inactive_titlebar_bg = sage,
+	active_titlebar_fg = ink,
+	inactive_titlebar_fg = ink,
+	active_titlebar_border_bottom = sage,
+	inactive_titlebar_border_bottom = sage,
+	border_left_width = "1px",
+	border_right_width = "1px",
+	border_top_height = "1px",
+	border_bottom_height = "1px",
+	border_left_color = sage,
+	border_right_color = sage,
+	border_top_color = sage,
+	border_bottom_color = sage,
+}
 config.enable_scroll_bar = true
 
 -- Mirror Ghostty's multiplexing keys so switching terminals costs no retraining.
