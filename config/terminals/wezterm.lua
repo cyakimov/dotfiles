@@ -36,8 +36,8 @@ config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 config.force_reverse_video_cursor = false
 
-config.font = wezterm.font("Hack Nerd Font")
-config.font_size = 15.0
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "DemiBold" })
+config.font_size = 14.0
 config.window_background_opacity = 0.8
 config.macos_window_background_blur = 50
 config.hide_tab_bar_if_only_one_tab = true
